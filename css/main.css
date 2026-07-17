@@ -7,18 +7,18 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bone: #0E1526;              /* page canvas: warm ivory */
-  --white: #1A2438;             /* raised panels: white cards */
-  --ink: rgba(238, 242, 250, 0.94);
-  --ink-soft: rgba(238, 242, 250, 0.6);
-  --line: rgba(185, 145, 63, 0.3);
-  --line-soft: rgba(185, 145, 63, 0.16);
-  --evergreen: #1C2740;
-  --evergreen-deep: #080E1C;
+  --bone: #FFFFFF;              /* page canvas: white */
+  --white: #FFFFFF;             /* raised panels: white cards */
+  --ink: rgba(16, 21, 38, 0.92);
+  --ink-soft: rgba(16, 21, 38, 0.55);
+  --line: rgba(16, 21, 38, 0.12);
+  --line-soft: rgba(16, 21, 38, 0.07);
+  --evergreen: #141F2E;
+  --evergreen-deep: #0E1526;
   --evergreen-mid: #2A3A5C;
   --gold: #B9913F;
   --gold-grad: #B9913F;
-  --footer-bg: #080E1C;
+  --footer-bg: #0E1526;
   --radius: 22px;
   --pill: 48px;
   --maxw: 1280px;
@@ -91,7 +91,7 @@ section { padding: 96px 0 0; }
   max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad);
   height: 68px; display: flex; align-items: center; gap: 28px;
 }
-.wordmark { font-family: "Fraunces", Georgia, serif; font-size: 26px; font-weight: 600; letter-spacing: 0.05em; color: var(--gold); text-transform: uppercase; }
+.wordmark { font-family: "Fraunces", Georgia, serif; font-size: 26px; font-weight: 600; letter-spacing: 0.05em; color: var(--ink); text-transform: uppercase; }
 .mark-plus {
   display: inline-block;
   width: 0.24em; height: 0.24em;
