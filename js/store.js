@@ -112,8 +112,8 @@ function shellHeaderHTML() {
   return '' +
   '<div class="announce">' +
     '<div class="announce-inner">' +
-      '<span>The Recovery Peptide Stack is here.</span>' +
-      '<a class="announce-btn" href="shop.html?cat=peptides">Check it out &rarr;</a>' +
+      '<span>GLP-1 Support has arrived.</span>' +
+      '<a class="announce-btn" href="product.html?id=glp1-support">Check it out &rarr;</a>' +
     '</div>' +
   '</div>' +
   '<header class="site-header">' +
@@ -124,9 +124,9 @@ function shellHeaderHTML() {
       '<a class="wordmark" href="index.html">nexus health<span class="mark-plus"></span></a>' +
       '<nav class="main-nav" aria-label="Main">' +
         '<a href="shop.html">Shop</a>' +
-        '<a href="shop.html?cat=supplements">Supplements</a>' +
-        '<a href="shop.html?cat=peptides">Peptides</a>' +
-        '<a href="shop.html?cat=protein">Protein</a>' +
+        '<a href="shop.html?cat=daily">Daily</a>' +
+        '<a href="shop.html?cat=performance">Performance</a>' +
+        '<a href="shop.html?cat=vitality">Vitality</a>' +
       '</nav>' +
       '<div class="nav-right">' +
         '<a class="nav-about" href="index.html#experts">About</a>' +
@@ -138,9 +138,9 @@ function shellHeaderHTML() {
     '</div>' +
     '<div class="mobile-menu" id="mobileMenu">' +
       '<a href="shop.html">Shop</a>' +
-      '<a href="shop.html?cat=supplements">Supplements</a>' +
-      '<a href="shop.html?cat=peptides">Peptides</a>' +
-      '<a href="shop.html?cat=protein">Protein</a>' +
+      '<a href="shop.html?cat=daily">Daily</a>' +
+      '<a href="shop.html?cat=performance">Performance</a>' +
+      '<a href="shop.html?cat=vitality">Vitality</a>' +
       '<a href="index.html#experts">About</a>' +
     '</div>' +
   '</header>' +
@@ -166,9 +166,9 @@ function shellFooterHTML() {
           '<p>Supplements, peptides, and protein for people who take their edge seriously.</p></div>' +
         '<div class="footer-col"><h4>Shop</h4>' +
           '<a href="shop.html">Shop all</a>' +
-          '<a href="shop.html?cat=supplements">Supplements</a>' +
-          '<a href="shop.html?cat=peptides">Peptides</a>' +
-          '<a href="shop.html?cat=protein">Protein</a></div>' +
+          '<a href="shop.html?cat=daily">Daily Essentials</a>' +
+          '<a href="shop.html?cat=performance">Performance</a>' +
+          '<a href="shop.html?cat=vitality">Vitality</a></div>' +
         '<div class="footer-col"><h4>Learn</h4>' +
           '<a href="index.html#science">The science</a>' +
           '<a href="index.html#experts">Experts</a>' +
@@ -319,7 +319,7 @@ function initHome() {
   // Product lineup scroller (dark section)
   var scroller = document.getElementById("lineupScroller");
   if (scroller) {
-    var lineupIds = ["comeback", "charge", "off-switch", "base-vanilla", "reboot", "locked-in", "rebuild", "clarity"];
+    var lineupIds = ["glp1-support", "collagen-chocolate", "creatine-hydration", "ashwagandha-plus", "mushroom-coffee", "colostrum", "shilajit", "digestive-enzyme"];
     scroller.innerHTML = lineupIds.map(function (id) {
       return productCardHTML(getProductById(id), { lineup: true });
     }).join("");
@@ -386,9 +386,9 @@ var GOAL_TITLES = {
   focus: "Sharpen focus"
 };
 var CAT_TITLES = {
-  supplements: "Supplements",
-  peptides: "Peptides",
-  protein: "Protein"
+  daily: "Daily Essentials",
+  performance: "Performance",
+  vitality: "Vitality"
 };
 
 function initShop() {
