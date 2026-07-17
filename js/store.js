@@ -121,7 +121,7 @@ function shellHeaderHTML() {
       '<button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">' +
         '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
       '</button>' +
-      '<a class="wordmark" href="index.html">nexus health<span class="mark-plus"></span></a>' +
+      '<a class="wordmark" href="index.html">NEXUS</a>' +
       '<nav class="main-nav" aria-label="Main">' +
         '<a href="shop.html">Shop</a>' +
         '<a href="shop.html?cat=daily">Daily</a>' +
@@ -162,7 +162,7 @@ function shellFooterHTML() {
   '<footer class="site-footer">' +
     '<div class="footer-inner">' +
       '<div class="footer-grid">' +
-        '<div class="footer-brand"><span class="footer-wordmark">nexus health<span class="mark-plus"></span></span>' +
+        '<div class="footer-brand"><span class="footer-wordmark">NEXUS</span>' +
           '<p>Supplements, peptides, and protein for people who take their edge seriously.</p></div>' +
         '<div class="footer-col"><h4>Shop</h4>' +
           '<a href="shop.html">Shop all</a>' +
