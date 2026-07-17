@@ -67,7 +67,7 @@ section { padding: 96px 0 0; }
 .text-btn:hover { opacity: 0.65; }
 
 /* ============ Announcement bar ============ */
-.announce { background: var(--evergreen-deep); }
+.announce { background: #080D18; }
 .announce-inner {
   max-width: var(--maxw); margin: 0 auto; padding: 9px var(--pad);
   display: flex; align-items: center; justify-content: center; gap: 14px;
@@ -84,7 +84,7 @@ section { padding: 96px 0 0; }
 /* ============ Header ============ */
 .site-header {
   position: sticky; top: 0; z-index: 60;
-  background: var(--evergreen-deep);
+  background: #17233F;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .nav-inner {
