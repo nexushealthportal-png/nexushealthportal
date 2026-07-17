@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | Nexus Health</title>
+  <meta name="description" content="Checkout at Nexus Health.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..650;1,9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css?v=1784327228">
+</head>
+<body data-page="checkout">
+
+  <main>
+    <div class="container checkout-wrap" id="checkoutMain">
+      <h1>Checkout</h1>
+      <div class="checkout-grid">
+        <div class="checkout-form-card">
+          <form id="checkoutForm" novalidate>
+            <div class="form-section">
+              <h2>Contact</h2>
+              <div class="form-row single">
+                <div class="field">
+                  <label for="coEmail">Email</label>
+                  <input id="coEmail" type="email" required autocomplete="email" placeholder="you@example.com">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2>Shipping address</h2>
+              <div class="form-row">
+                <div class="field">
+                  <label for="coFirst">First name</label>
+                  <input id="coFirst" type="text" required autocomplete="given-name">
+                </div>
+                <div class="field">
+                  <label for="coLast">Last name</label>
+                  <input id="coLast" type="text" required autocomplete="family-name">
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="field">
+                  <label for="coAddress">Address</label>
+                  <input id="coAddress" type="text" required autocomplete="street-address">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label for="coCity">City</label>
+                  <input id="coCity" type="text" required autocomplete="address-level2">
+                </div>
+                <div class="field">
+                  <label for="coState">State</label>
+                  <input id="coState" type="text" required autocomplete="address-level1">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label for="coZip">ZIP code</label>
+                  <input id="coZip" type="text" required inputmode="numeric" autocomplete="postal-code">
+                </div>
+                <div class="field">
+                  <label for="coPhone">Phone (optional)</label>
+                  <input id="coPhone" type="tel" autocomplete="tel">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2>Payment</h2>
+              <p class="payment-note">Demo checkout. Payments are not wired up yet.</p>
+              <div class="form-row single">
+                <div class="field">
+                  <label for="coCard">Card number</label>
+                  <input id="coCard" type="text" disabled placeholder="•••• •••• •••• ••••">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label for="coExp">Expiry</label>
+                  <input id="coExp" type="text" disabled placeholder="MM / YY">
+                </div>
+                <div class="field">
+                  <label for="coCvc">Security code</label>
+                  <input id="coCvc" type="text" disabled placeholder="•••">
+                </div>
+              </div>
+            </div>
+          </form>
+          <button class="btn btn-primary place-order" id="placeOrder">Place order</button>
+        </div>
+
+        <div class="order-summary">
+          <h2>Order summary</h2>
+          <div id="orderSummary"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/products.js?v=1784327228"></script>
+  <script src="js/store.js?v=1784327228"></script>
+</body>
+</html>
