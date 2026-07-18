@@ -19,7 +19,7 @@ const PRODUCTS = [
       { name: "Chromium Picolinate", dose: "200 mcg" }
     ],
     howToUse: "Take two capsules daily with your largest meal.",
-    img: "capsules-bottle-grey"
+    img: "glp1-support-bottle"
   },
   {
     id: "digestive-enzyme",
