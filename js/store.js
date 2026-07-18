@@ -316,6 +316,10 @@ function bindCardAdds(container) {
    ============================================================ */
 
 function initHome() {
+  // Featured product spotlight add-to-cart
+  var fc = document.getElementById("featureCard");
+  if (fc) bindCardAdds(fc);
+
   // Product lineup scroller (dark section)
   var scroller = document.getElementById("lineupScroller");
   if (scroller) {

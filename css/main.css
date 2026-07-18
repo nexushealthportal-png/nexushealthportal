@@ -668,3 +668,53 @@ section { padding: 96px 0 0; }
 @media (max-width: 480px) {
   .product-grid .featured { grid-column: auto; }
 }
+
+/* ============ Nutrafol-inspired homepage remix ============ */
+.hero-n { background: #0E1526; color: #fff; padding: 64px 0 80px; text-align: center; }
+.hero-eyebrow { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; color: var(--gold); }
+.hero-halo { width: 320px; height: 320px; margin: 46px auto 40px; border-radius: 50%; position: relative; }
+.hero-halo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.hero-halo::after { content: ""; position: absolute; inset: -24px; border: 2px dotted rgba(199, 162, 90, 0.55); border-radius: 50%; }
+.hero-n h1 { font-size: 54px; color: #fff; max-width: 760px; margin: 0 auto; line-height: 1.05; }
+.hero-n-sub { margin: 18px auto 0; font-size: 18px; color: rgba(255, 255, 255, 0.66); max-width: 520px; }
+.hero-cta { display: flex; gap: 14px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+.btn-ghost { background: transparent; color: #fff; border: 1.5px solid rgba(255, 255, 255, 0.45); }
+.btn-ghost:hover { border-color: #fff; transform: translateY(-1px); }
+.hero-stars { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 28px; font-size: 14px; color: rgba(255, 255, 255, 0.72); }
+
+.stats-band { background: var(--white); border-bottom: 1px solid var(--line-soft); padding: 34px 0; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
+.stat strong { display: block; font-family: "Fraunces", Georgia, serif; font-size: 34px; font-weight: 600; color: var(--evergreen-deep); line-height: 1; }
+.stat span { display: block; margin-top: 6px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); }
+
+.feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.feature-art { border-radius: var(--radius); overflow: hidden; background: #F4F2EA; }
+.feature-art img { width: 100%; height: auto; display: block; }
+.feature-body h2 { font-size: 42px; margin-top: 12px; }
+.feature-tag { margin-top: 12px; font-size: 17px; color: var(--ink-soft); }
+.feature-list { list-style: none; margin: 24px 0 0; padding: 0; }
+.feature-list li { position: relative; padding: 8px 0 8px 34px; font-size: 15px; }
+.feature-list li::before { content: ""; position: absolute; left: 0; top: 9px; width: 20px; height: 20px; border-radius: 50%; background: var(--gold); }
+.feature-list li::after { content: ""; position: absolute; left: 5px; top: 15px; width: 10px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg); }
+.feature-price { display: flex; align-items: baseline; gap: 10px; margin-top: 22px; }
+.feature-price strong { font-size: 26px; font-weight: 700; color: var(--gold); }
+.feature-price span { font-size: 14px; color: var(--ink-soft); }
+.feature-cta { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+
+.timeline-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 44px; }
+.timeline-card { background: var(--white); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 30px; }
+.timeline-num { font-family: "Fraunces", Georgia, serif; font-size: 40px; font-weight: 600; color: var(--gold); line-height: 1; display: block; }
+.timeline-card h3 { font-size: 20px; margin-top: 14px; }
+.timeline-card p { margin-top: 10px; font-size: 15px; color: var(--ink-soft); }
+
+.rev-tags { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.rev-tags span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold); border: 1px solid rgba(185, 145, 63, 0.45); border-radius: var(--pill); padding: 4px 10px; }
+
+@media (max-width: 860px) {
+  .hero-n h1 { font-size: 36px; }
+  .hero-halo { width: 240px; height: 240px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 26px 12px; }
+  .feature-grid { grid-template-columns: 1fr; gap: 28px; }
+  .feature-body h2 { font-size: 30px; }
+  .timeline-row { grid-template-columns: 1fr; }
+}
