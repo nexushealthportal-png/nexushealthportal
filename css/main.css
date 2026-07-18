@@ -204,13 +204,13 @@ section { padding: 96px 0 0; }
 .lineup-scroller {
   display: flex; gap: 16px; margin-top: 48px;
   padding: 4px 32px 12px;
-  overflow-x: auto; scroll-snap-type: x mandatory;
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 .lineup-scroller::-webkit-scrollbar { height: 8px; }
 .lineup-scroller::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); border-radius: 4px; }
 .lineup-scroller::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.06); border-radius: 4px; }
-.lineup-card { flex: 0 0 260px; scroll-snap-align: start; }
+.lineup-card { flex: 0 0 260px; }
 
 /* ============ Product card (shared) ============ */
 .product-card {
@@ -657,7 +657,6 @@ section { padding: 96px 0 0; }
 
 /* Lineup scroller: staggered editorial rhythm, bigger cards */
 .lineup-card { flex: 0 0 290px; }
-.lineup-scroller .product-card:nth-child(even) { margin-top: 30px; }
 .lineup-scroller { padding-bottom: 44px; }
 
 @media (max-width: 860px) {
