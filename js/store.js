@@ -279,6 +279,171 @@ function initShell() {
   });
 
   renderCartUI();
+  initQuiz();
+}
+
+/* ============================================================
+   Find your routine quiz
+   ============================================================ */
+
+var QUIZ_FORM = {
+  capsule: ["glp1-support", "digestive-enzyme", "ashwagandha-plus", "libido-strips"],
+  powder: ["collagen-chocolate", "creatine-hydration", "colostrum", "mushroom-coffee", "shilajit"]
+};
+var QUIZ_GOAL = {
+  energy: ["shilajit", "mushroom-coffee", "creatine-hydration"],
+  calm: ["ashwagandha-plus", "colostrum", "digestive-enzyme"],
+  strength: ["creatine-hydration", "collagen-chocolate", "glp1-support"],
+  gut: ["digestive-enzyme", "colostrum", "ashwagandha-plus"],
+  metabolism: ["glp1-support", "digestive-enzyme", "mushroom-coffee"]
+};
+var QUIZ_STEPS = [
+  { q: "What are you optimizing for first?", opts: [
+    { label: "Energy and focus", value: "energy" },
+    { label: "Sleep and stress", value: "calm" },
+    { label: "Strength and recovery", value: "strength" },
+    { label: "Gut and daily health", value: "gut" },
+    { label: "Metabolism and weight", value: "metabolism" }
+  ], key: "goal" },
+  { q: "How do you like to take things?", opts: [
+    { label: "Capsules, quick and simple", value: "capsule" },
+    { label: "Powders and drinks", value: "powder" },
+    { label: "No preference, whatever works", value: "any" }
+  ], key: "form" },
+  { q: "Where are you starting from?", opts: [
+    { label: "Just testing the waters", value: "one" },
+    { label: "Ready to commit to a routine", value: "sub" }
+  ], key: "commit" }
+];
+
+function quizRecommend(ans) {
+  var pool = (QUIZ_GOAL[ans.goal] || []).slice();
+  if (ans.form === "capsule" || ans.form === "powder") {
+    var pref = QUIZ_FORM[ans.form];
+    pool.sort(function (a, b) { return (pref.indexOf(b) !== -1) - (pref.indexOf(a) !== -1); });
+  }
+  PRODUCTS.forEach(function (p) { if (pool.indexOf(p.id) === -1) pool.push(p.id); });
+  return pool.slice(0, 3);
+}
+
+function initQuiz() {
+  var ov = document.createElement("div");
+  ov.className = "quiz-overlay";
+  ov.id = "quizOverlay";
+  ov.innerHTML =
+    '<button class="quiz-close" id="quizClose" aria-label="Close quiz">' +
+      '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
+    '</button>' +
+    '<div class="quiz-inner"><div class="quiz-progress-track"><div class="quiz-progress-bar" id="quizBar"></div></div>' +
+    '<div id="quizBody"></div></div>';
+  document.body.appendChild(ov);
+
+  var state = { step: 0, ans: {} };
+
+  function renderStep() {
+    var body = document.getElementById("quizBody");
+    document.getElementById("quizBar").style.width = ((state.step) / QUIZ_STEPS.length * 100) + "%";
+    if (state.step >= QUIZ_STEPS.length) { renderResult(); return; }
+    var s = QUIZ_STEPS[state.step];
+    body.innerHTML =
+      '<span class="quiz-step-count">Step ' + (state.step + 1) + ' of ' + QUIZ_STEPS.length + '</span>' +
+      '<h2 class="quiz-q">' + esc(s.q) + '</h2>' +
+      '<div class="quiz-options">' + s.opts.map(function (o) {
+        return '<button class="quiz-opt" data-val="' + esc(o.value) + '"><span class="dot"></span>' + esc(o.label) + '</button>';
+      }).join("") + '</div>' +
+      (state.step > 0 ? '<button class="quiz-back" id="quizBack">&larr; Back</button>' : '');
+    body.querySelectorAll(".quiz-opt").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        state.ans[s.key] = btn.getAttribute("data-val");
+        state.step++;
+        renderStep();
+      });
+    });
+    var back = document.getElementById("quizBack");
+    if (back) back.addEventListener("click", function () { state.step--; renderStep(); });
+  }
+
+  function renderResult() {
+    document.getElementById("quizBar").style.width = "100%";
+    var recs = quizRecommend(state.ans).map(getProductById).filter(Boolean);
+    var variant = state.ans.commit === "sub" ? "sub" : "one";
+    var body = document.getElementById("quizBody");
+    body.innerHTML =
+      '<span class="quiz-step-count">Your routine</span>' +
+      '<h2 class="quiz-result-head">Built for your biology.</h2>' +
+      '<p class="quiz-result-sub">Based on your answers, this is where we would start you.</p>' +
+      '<div class="quiz-rec-grid">' + recs.map(function (p) {
+        return '<a class="quiz-rec" href="product.html?id=' + esc(p.id) + '">' +
+          '<div class="art">' + productImg(p) + '</div>' +
+          '<div class="rb"><h4>' + esc(p.name) + '</h4><div class="rp">' + money(variant === "sub" ? p.subPrice : p.price) + (variant === "sub" ? "/mo" : "") + '</div></div>' +
+        '</a>';
+      }).join("") + '</div>' +
+      '<button class="btn btn-primary quiz-addall" id="quizAddAll">Add all to cart</button>' +
+      '<button class="quiz-restart" id="quizRestart">Start over</button>';
+    document.getElementById("quizAddAll").addEventListener("click", function () {
+      recs.forEach(function (p) { addToCart(p.id, variant, 1); });
+      closeQuiz();
+    });
+    document.getElementById("quizRestart").addEventListener("click", function () {
+      state.step = 0; state.ans = {}; renderStep();
+    });
+  }
+
+  function openQuiz() { state.step = 0; state.ans = {}; renderStep(); ov.classList.add("open"); document.body.classList.add("drawer-lock"); }
+  function closeQuiz() { ov.classList.remove("open"); document.body.classList.remove("drawer-lock"); }
+  window.__openQuiz = openQuiz;
+
+  document.getElementById("quizClose").addEventListener("click", closeQuiz);
+  ov.addEventListener("click", function (e) { if (e.target === ov) closeQuiz(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeQuiz(); });
+  document.querySelectorAll(".quiz-open-btn").forEach(function (b) {
+    b.addEventListener("click", function (e) { e.preventDefault(); openQuiz(); });
+  });
+}
+
+/* ============================================================
+   Scroll reveal + animated counters
+   ============================================================ */
+
+function initReveal() {
+  if (!("IntersectionObserver" in window)) return;
+  var sel = ".stats-band, .feature-grid, .timeline-card, .cat-card, .expert-card, .review-card, .goal-tile, .science-grid, .guide-card, .lineup-head, .acc-item, .promo-card";
+  var els = [].slice.call(document.querySelectorAll(sel));
+  if (!els.length) return;
+  els.forEach(function (el) { el.classList.add("reveal"); });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add("in"); obs.unobserve(en.target); }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+  els.forEach(function (el) { obs.observe(el); });
+}
+
+function initCounters() {
+  var band = document.querySelector(".stats-band");
+  if (!band || !("IntersectionObserver" in window)) return;
+  var nums = [].slice.call(band.querySelectorAll(".stat strong"));
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      obs.disconnect();
+      nums.forEach(function (el) {
+        var raw = el.textContent;
+        var m = raw.match(/^(\d+)(.*)$/);
+        if (!m) return;
+        var target = parseInt(m[1], 10), suffix = m[2], start = null, dur = 1100;
+        function tick(t) {
+          if (start === null) start = t;
+          var p = Math.min(1, (t - start) / dur);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(eased * target) + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    });
+  }, { threshold: 0.5 });
+  obs.observe(band);
 }
 
 /* ============================================================
@@ -651,6 +816,8 @@ function initCheckout() {
 
 document.addEventListener("DOMContentLoaded", function () {
   initShell();
+  initReveal();
+  initCounters();
   var page = document.body.getAttribute("data-page");
   if (page === "home") initHome();
   else if (page === "shop") initShop();
