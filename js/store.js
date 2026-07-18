@@ -52,6 +52,21 @@ var CART_KEY = "vital_cart";
 var FREE_SHIP = 75;
 var SHIP_COST = 6.95;
 
+/* Nexus Membership: flat monthly fee that unlocks a members-only discount
+   on every order. Pre-selected at checkout, toggleable, cancel anytime. */
+var MEMBER_KEY = "vital_member";
+var MEMBER_FEE = 50;
+var MEMBER_RATE = 0.20;
+
+function isMember() {
+  var v = localStorage.getItem(MEMBER_KEY);
+  return v === null ? true : v === "1"; // default: enrolled (box pre-checked)
+}
+
+function setMember(on) {
+  localStorage.setItem(MEMBER_KEY, on ? "1" : "0");
+}
+
 function getCart() {
   try {
     var raw = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
@@ -767,8 +782,11 @@ function renderOrderSummary() {
   }
 
   var sub = cartSubtotal();
-  var shipping = sub >= FREE_SHIP ? 0 : SHIP_COST;
-  var total = sub + shipping;
+  var member = isMember();
+  var discount = member ? Math.round(sub * MEMBER_RATE * 100) / 100 : 0;
+  var goods = sub - discount;
+  var shipping = goods >= FREE_SHIP ? 0 : SHIP_COST;
+  var total = goods + shipping + (member ? MEMBER_FEE : 0);
 
   el.innerHTML =
     items.map(function (item) {
@@ -779,12 +797,33 @@ function renderOrderSummary() {
         '<span>' + money(itemPrice(item) * item.qty) + '</span>' +
       '</div>';
     }).join("") +
+    '<label class="member-card' + (member ? " on" : "") + '" id="memberCard">' +
+      '<input type="checkbox" id="memberToggle"' + (member ? " checked" : "") + '>' +
+      '<span class="member-check" aria-hidden="true">' +
+        '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '</span>' +
+      '<span class="member-body">' +
+        '<span class="member-title">Nexus Membership <em>' + money(MEMBER_FEE) + '/mo</em></span>' +
+        '<span class="member-desc">20% off every order, member pricing applied below. Cancel anytime.</span>' +
+      '</span>' +
+    '</label>' +
     '<div class="summary-totals">' +
       '<div><span>Subtotal</span><span>' + money(sub) + '</span></div>' +
+      (member ? '<div class="summary-save"><span>Member savings (20%)</span><span>&minus;' + money(discount) + '</span></div>' : "") +
       '<div><span>Shipping</span><span>' + (shipping === 0 ? "Free" : money(shipping)) + '</span></div>' +
-      (shipping !== 0 ? '<p class="summary-note">Add ' + money(Math.round((FREE_SHIP - sub) * 100) / 100) + ' more for free shipping.</p>' : "") +
-      '<div class="summary-grand"><span>Total</span><span>' + money(Math.round(total * 100) / 100) + '</span></div>' +
+      (shipping !== 0 ? '<p class="summary-note">Add ' + money(Math.round((FREE_SHIP - goods) * 100) / 100) + ' more for free shipping.</p>' : "") +
+      (member ? '<div><span>Nexus Membership</span><span>' + money(MEMBER_FEE) + '/mo</span></div>' : "") +
+      '<div class="summary-grand"><span>Total due today</span><span>' + money(Math.round(total * 100) / 100) + '</span></div>' +
+      (member ? '<p class="summary-note member-note">Includes your first month of membership. Renews at ' + money(MEMBER_FEE) + '/mo, cancel anytime.</p>' : "") +
     '</div>';
+
+  var toggle = document.getElementById("memberToggle");
+  if (toggle) {
+    toggle.addEventListener("change", function () {
+      setMember(toggle.checked);
+      renderOrderSummary();
+    });
+  }
 }
 
 function initCheckout() {

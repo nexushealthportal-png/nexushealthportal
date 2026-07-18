@@ -770,3 +770,50 @@ section { padding: 96px 0 0; }
   .quiz-rec { display: flex; align-items: center; }
   .quiz-rec .art { width: 90px; height: 90px; flex-shrink: 0; }
 }
+
+/* ============================================================
+   Nexus Membership card (checkout order summary)
+   ============================================================ */
+.member-card {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  align-items: start;
+  margin: 18px 0 4px;
+  padding: 16px 16px 16px 15px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  cursor: pointer;
+  background: var(--white);
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.member-card.on {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(185,145,63,0.07), rgba(185,145,63,0.02));
+  box-shadow: 0 1px 0 rgba(185,145,63,0.18) inset;
+}
+.member-card input { position: absolute; opacity: 0; width: 0; height: 0; }
+.member-check {
+  width: 22px; height: 22px;
+  border-radius: 7px;
+  border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--white);
+  margin-top: 1px;
+  transition: background .16s ease, border-color .16s ease;
+}
+.member-check svg { opacity: 0; transition: opacity .12s ease; }
+.member-card.on .member-check { background: var(--gold); border-color: var(--gold); }
+.member-card.on .member-check svg { opacity: 1; }
+.member-body { display: flex; flex-direction: column; gap: 3px; }
+.member-title {
+  font-weight: 700; font-size: 15px; color: var(--ink);
+  display: flex; align-items: baseline; gap: 8px;
+}
+.member-title em {
+  font-style: normal; font-weight: 700; font-size: 13px;
+  color: var(--gold);
+}
+.member-desc { font-size: 13px; line-height: 1.45; color: var(--ink-soft); }
+.summary-save span:last-child { color: var(--gold); font-weight: 600; }
+.member-note { color: var(--ink-soft); }
