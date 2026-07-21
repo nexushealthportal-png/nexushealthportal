@@ -964,3 +964,182 @@ section { padding: 96px 0 0; }
   .offer-label svg { width: 15px; height: 15px; }
   .offer-clock b { padding: 6px 9px; font-size: 15px; }
 }
+
+/* ============================================================
+   EDITORIAL LUXURY LAYER
+   Structure and type language borrowed from high-end beauty
+   retail (full-bleed imagery, sharp corners, ghost buttons,
+   light display type at scale), rendered in the Nexus palette.
+   ============================================================ */
+
+:root { --tint: #F6F6F6; }
+
+/* 1. Sharp corners: the core luxury signal */
+.btn, .chip, .badge, .pill-chip, .product-card, .card-art, .goal-tile,
+.cat-card, .expert-card, .review-card, .guide-card, .quiz-opt, .quiz-rec,
+.acc-item, .option-card, .pack-pill, .pack-badge, .member-card, .member-check,
+.offer-box, .drawer-thumb, .summary-thumb, .announce-btn, .cart-btn,
+.checkout-form-card, .order-summary, .field input, .qty-stepper, .hero-halo,
+.tile-img, .quiz-rec .art, .progress-track, .progress-bar {
+  border-radius: 0 !important;
+}
+
+/* 2. Buttons: uppercase, letterspaced, generous, ghost-first */
+.btn {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 19px 34px;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.btn-primary {
+  background: var(--evergreen);
+  color: #fff;
+  border: 1px solid var(--evergreen);
+}
+.btn-primary:hover { background: transparent; color: var(--evergreen); }
+.btn-ghost, .btn-secondary {
+  background: transparent;
+  border: 1px solid var(--evergreen);
+  color: var(--evergreen);
+}
+.btn-ghost:hover, .btn-secondary:hover { background: var(--evergreen); color: #fff; }
+
+/* 3. Display type: light weight, large, tight, uppercase */
+.sec-head, .reviews-head, .faq-head,
+main section > .container > h2,
+.feature-copy h2, .science-copy h2, .timeline-head h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(26px, 3.4vw, 40px);
+  line-height: 1.12;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* 4. Eyebrow / label treatment */
+.hero-eyebrow, .sec-eyebrow, .stat span, .cat-card span, .rev-tags span {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* 5. Nav + wordmark spacing */
+.main-nav a, .nav-about, .mobile-menu a {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 12px;
+  font-weight: 500;
+}
+.announce { letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px; }
+
+/* 6. Full-bleed cinematic hero */
+.hero-lux {
+  position: relative;
+  min-height: 88vh;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.hero-lux-bg { position: absolute; inset: 0; }
+.hero-lux-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-lux-bg::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(14,21,38,0.46) 0%, rgba(14,21,38,0.56) 32%, rgba(14,21,38,0.78) 66%, rgba(14,21,38,0.93) 100%);
+}
+.hero-lux-inner { position: relative; padding: 0 0 96px; max-width: 900px; }
+.hero-lux .hero-eyebrow { color: var(--gold); display: block; margin-bottom: 22px; }
+.hero-lux h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(42px, 7.4vw, 94px);
+  line-height: 1.0;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 24px;
+}
+.hero-lux p {
+  color: rgba(255,255,255,0.86);
+  font-size: clamp(15px, 1.5vw, 18px);
+  max-width: 520px;
+  margin-bottom: 38px;
+}
+.hero-lux .btn-ghost {
+  border-color: rgba(255,255,255,0.85);
+  color: #fff;
+}
+.hero-lux .btn-ghost:hover { background: #fff; color: var(--evergreen); }
+.hero-lux .btn-primary { background: #fff; color: var(--evergreen); border-color: #fff; }
+.hero-lux .btn-primary:hover { background: transparent; color: #fff; }
+.hero-lux-cta { display: flex; flex-wrap: wrap; gap: 14px; }
+
+/* 7. Editorial split blocks */
+.ed-block { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; }
+.ed-block.flip .ed-art { order: 2; }
+.ed-art { min-height: 520px; overflow: hidden; }
+.ed-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ed-copy {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(40px, 6vw, 96px);
+  background: var(--tint);
+}
+.ed-block.dark .ed-copy { background: var(--evergreen); }
+.ed-block.dark .ed-copy h2, .ed-block.dark .ed-copy p { color: #fff; }
+.ed-block.dark .ed-copy .btn-ghost { border-color: rgba(255,255,255,0.8); color: #fff; }
+.ed-block.dark .ed-copy .btn-ghost:hover { background: #fff; color: var(--evergreen); }
+.ed-copy .sec-eyebrow { color: var(--gold); display: block; margin-bottom: 18px; }
+.ed-copy h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(28px, 3.2vw, 44px);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.ed-copy p { color: var(--ink-soft); font-size: 16px; line-height: 1.65; margin-bottom: 30px; max-width: 430px; }
+.ed-copy .btn { align-self: flex-start; }
+
+/* 8. Generous editorial rhythm + centered section heads */
+.sec-lux { padding: clamp(72px, 9vw, 128px) 0; }
+.sec-lux.tint { background: var(--tint); }
+.sec-head-wrap { text-align: center; margin-bottom: clamp(40px, 5vw, 64px); }
+.sec-head-wrap .sec-eyebrow { color: var(--gold); display: block; margin-bottom: 16px; }
+.sec-head-wrap p { color: var(--ink-soft); max-width: 560px; margin: 16px auto 0; font-size: 16px; }
+
+@media (max-width: 860px) {
+  .ed-block { grid-template-columns: 1fr; }
+  .ed-block.flip .ed-art { order: 0; }
+  .ed-art { min-height: 320px; }
+  .hero-lux { min-height: 76vh; }
+  .hero-lux-inner { padding-bottom: 64px; }
+}
+
+/* Editorial layer: hero rating + split-block internals */
+.hero-lux .hero-stars {
+  margin-top: 34px;
+  display: flex; align-items: center; gap: 11px;
+  color: rgba(255,255,255,0.82);
+  font-size: 13px;
+}
+.ed-copy .feature-price {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 28px;
+}
+.ed-copy .feature-price strong {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 300;
+  font-size: 34px;
+  color: var(--gold);
+}
+.ed-copy .feature-price span { font-size: 13px; color: var(--ink-soft); }
+.ed-block.dark .ed-copy .feature-price span { color: rgba(255,255,255,0.6); }
+.ed-copy .feature-cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-lux .hero-eyebrow { text-shadow: 0 1px 14px rgba(14,21,38,0.75); }
+.hero-lux h1 { text-shadow: 0 2px 30px rgba(14,21,38,0.35); }
