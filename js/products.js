@@ -40,7 +40,7 @@ const PRODUCTS = [
       { name: "Bromelain", dose: "included" }
     ],
     howToUse: "Take one capsule at the start of each meal.",
-    img: "capsules"
+    img: "bottle-white"
   },
   {
     id: "ashwagandha-plus",
@@ -78,7 +78,7 @@ const PRODUCTS = [
       { name: "Natural Cocoa", dose: "included" }
     ],
     howToUse: "Mix one scoop into your drink of choice once daily.",
-    img: "choc-shake"
+    img: "protein-scoop"
   },
   {
     id: "shilajit",
@@ -97,7 +97,7 @@ const PRODUCTS = [
       { name: "Fulvic Acid", dose: "50%" }
     ],
     howToUse: "Take one serving daily with water.",
-    img: "dropper-stone"
+    img: "omega-bottle"
   },
   {
     id: "libido-strips",
@@ -179,7 +179,7 @@ const PRODUCTS = [
       { name: "Cordyceps Extract", dose: "included" }
     ],
     howToUse: "Brew one scoop or sachet as you would normal coffee.",
-    img: "protein-top"
+    img: "bottles-pedestal"
   }
 ];
 

@@ -535,7 +535,7 @@ function initHome() {
   if (scroller) {
     var lineupIds = ["glp1-support", "collagen-chocolate", "creatine-hydration", "ashwagandha-plus", "mushroom-coffee", "colostrum", "shilajit", "digestive-enzyme"];
     scroller.innerHTML = lineupIds.map(function (id) {
-      return productCardHTML(getProductById(id), { lineup: true });
+      return productCardHTML(getProductById(id));
     }).join("");
     bindCardAdds(scroller);
   }
