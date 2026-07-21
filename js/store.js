@@ -79,8 +79,35 @@ function saveCart(items) {
   renderCartUI();
 }
 
+/* Pack tiers: the bigger the pack, the deeper the discount. The advertised
+   percentage is the subscription rate; a one-time buy gives up 15 points of it. */
+var PACKS = [
+  { key: "single", label: "SINGLE", qty: 1, off: 0.30 },
+  { key: "two", label: "2-PACK", qty: 2, off: 0.40 },
+  { key: "six", label: "6-PACK", qty: 6, off: 0.48 }
+];
+var ONE_TIME_PENALTY = 0.15;
+
+function packByKey(key) {
+  for (var i = 0; i < PACKS.length; i++) if (PACKS[i].key === key) return PACKS[i];
+  return PACKS[0];
+}
+
+function packOff(pack, variant) {
+  return variant === "sub" ? pack.off : Math.max(0, pack.off - ONE_TIME_PENALTY);
+}
+
+function packPrice(p, pack, variant) {
+  return Math.round(p.price * pack.qty * (1 - packOff(pack, variant)) * 100) / 100;
+}
+
+function packLabel(item) {
+  return item.pack ? packByKey(item.pack).label + " · " : "";
+}
+
 function itemPrice(item) {
   var p = getProductById(item.id);
+  if (item.pack) return packPrice(p, packByKey(item.pack), item.variant);
   return item.variant === "sub" ? p.subPrice : p.price;
 }
 
@@ -92,11 +119,14 @@ function cartSubtotal() {
   return getCart().reduce(function (n, i) { return n + itemPrice(i) * i.qty; }, 0);
 }
 
-function addToCart(id, variant, qty) {
+function addToCart(id, variant, qty, pack) {
   var items = getCart();
-  var found = items.find(function (i) { return i.id === id && i.variant === variant; });
+  var key = pack || null;
+  var found = items.find(function (i) {
+    return i.id === id && i.variant === variant && (i.pack || null) === key;
+  });
   if (found) found.qty += qty;
-  else items.push({ id: id, variant: variant, qty: qty });
+  else items.push({ id: id, variant: variant, qty: qty, pack: key });
   saveCart(items);
   openDrawer();
 }
@@ -234,7 +264,7 @@ function renderCartUI() {
       '<a class="drawer-thumb" href="product.html?id=' + esc(p.id) + '">' + productImg(p) + '</a>' +
       '<div class="drawer-item-info">' +
         '<a class="drawer-item-name" href="product.html?id=' + esc(p.id) + '">' + esc(p.name) + '</a>' +
-        '<span class="drawer-item-variant">' + (item.variant === "sub" ? "Subscription" : "One-time") + '</span>' +
+        '<span class="drawer-item-variant">' + esc(packLabel(item)) + (item.variant === "sub" ? "Subscription" : "One-time") + '</span>' +
         '<div class="drawer-item-row">' +
           '<span class="qty-stepper">' +
             '<button data-qty="-1" data-idx="' + idx + '" aria-label="Decrease quantity">&minus;</button>' +
@@ -633,6 +663,38 @@ var GOAL_CHIPS = {
   focus: "Sharper focus"
 };
 
+/* Countdown on the limited-time offer. The window is held in sessionStorage so
+   it keeps ticking across pages instead of resetting on every render. */
+var OFFER_MS = 15 * 60 * 1000;
+
+function initOfferClock() {
+  var minEl = document.getElementById("offMin");
+  var secEl = document.getElementById("offSec");
+  if (!minEl || !secEl) return;
+
+  var endAt = parseInt(sessionStorage.getItem("vital_offer_end") || "0", 10);
+  if (!endAt || endAt <= Date.now()) {
+    endAt = Date.now() + OFFER_MS;
+    sessionStorage.setItem("vital_offer_end", String(endAt));
+  }
+
+  function pad(n) { return n < 10 ? "0" + n : String(n); }
+
+  function tick() {
+    var left = endAt - Date.now();
+    if (left <= 0) {
+      endAt = Date.now() + OFFER_MS;
+      sessionStorage.setItem("vital_offer_end", String(endAt));
+      left = OFFER_MS;
+    }
+    minEl.textContent = pad(Math.floor(left / 60000));
+    secEl.textContent = pad(Math.floor((left % 60000) / 1000));
+  }
+
+  tick();
+  setInterval(tick, 1000);
+}
+
 function initProduct() {
   var root = document.getElementById("pdpRoot");
   var p = getProductById(qs("id") || "");
@@ -650,9 +712,10 @@ function initProduct() {
   document.title = p.name + " | Nexus Health";
 
   var benefitChips = p.goals.map(function (g) { return GOAL_CHIPS[g]; });
-  benefitChips.push("Third-party tested");
+  ["Third-party tested", "Clinical doses", "No fillers"].forEach(function (c) {
+    if (benefitChips.length < 3 && benefitChips.indexOf(c) === -1) benefitChips.push(c);
+  });
   benefitChips = benefitChips.slice(0, 3);
-  while (benefitChips.length < 3) benefitChips.push("Clinical doses");
 
   var ingRows = p.ingredients.map(function (ing) {
     return '<tr><td>' + esc(ing.name) + '</td><td>' + esc(ing.dose) + '</td></tr>';
@@ -673,21 +736,55 @@ function initProduct() {
       '</div>' +
       '<div class="pdp-right">' +
         (p.badge ? '<span class="badge badge-inline">' + esc(p.badge) + '</span>' : "") +
-        '<h1>' + esc(p.name) + '</h1>' +
+        '<h1 class="pdp-title">' + esc(p.name) + '</h1>' +
         '<span class="pdp-subtitle">' + esc(p.subtitle) + '</span>' +
         '<div class="card-rating pdp-rating">' + starsSVG(p.rating) + '<span>' + p.rating + ' (' + fmtCount(p.reviews) + ' reviews)</span></div>' +
-        '<p class="pdp-tagline">' + esc(p.tagline) + '</p>' +
-        '<p class="pdp-desc">' + esc(p.description) + '</p>' +
+        '<div class="offer-box">' +
+          '<div class="save-strip" aria-hidden="true"><div class="save-track" id="saveTrack"></div></div>' +
+          '<div class="offer-body">' +
+            '<div class="offer-row">' +
+              '<span class="offer-label">' +
+                '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M7 3h10M7 21h10M8 3v3.6c0 1.5 4 3.4 4 5.4s-4 3.9-4 5.4V21M16 3v3.6c0 1.5-4 3.4-4 5.4s4 3.9 4 5.4V21" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>' +
+                'LIMITED TIME OFFER</span>' +
+              '<span class="offer-clock"><b id="offMin">15</b><i>:</i><b id="offSec">00</b></span>' +
+            '</div>' +
+            '<div class="offer-row offer-price-row">' +
+              '<span class="offer-cta">GET YOURS NOW FOR</span>' +
+              '<span class="offer-price"><strong id="offerNow"></strong><s id="offerWas"></s></span>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pdp-perks">' +
+          '<div class="perk perk-strong">' +
+            '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M3 7.2l9-4 9 4v9.6l-9 4-9-4V7.2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 7.2l9 4 9-4M12 11.2v9.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>' +
+            '<span id="shipLine"></span>' +
+          '</div>' +
+          '<div class="perk">' +
+            '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.4-5.9M20 12a8 8 0 0 1-13.4 5.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M18.5 2.5V7h-4.5M5.5 21.5V17H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '<span>Recurring subscription (see below for details)</span>' +
+          '</div>' +
+        '</div>' +
+        '<h3 class="pdp-select-head">Select your quantity</h3>' +
+        '<div class="pack-row" id="packRow" role="radiogroup" aria-label="Quantity">' +
+          PACKS.map(function (pk, i) {
+            return '<button class="pack-pill' + (i === 0 ? " active" : "") + '" data-pack="' + esc(pk.key) + '" role="radio" aria-checked="' + (i === 0 ? "true" : "false") + '">' +
+              '<span class="pack-name">' + esc(pk.label) + '</span>' +
+              '<span class="pack-badge">' + Math.round(pk.off * 100) + '% OFF</span>' +
+            '</button>';
+          }).join("") +
+        '</div>' +
+        '<div class="pdp-note"><span class="note-dot" aria-hidden="true"></span>Most customers pick the 2-pack</div>' +
+        '<h3 class="pdp-select-head">Select your plan</h3>' +
         '<div class="option-cards" role="radiogroup" aria-label="Purchase options">' +
           '<label class="option-card selected">' +
             '<input type="radio" name="variant" value="sub" checked>' +
-            '<span class="option-title">Subscribe &amp; save 20%</span>' +
-            '<span class="option-sub">' + money(p.subPrice) + '/mo, pause or cancel anytime</span>' +
+            '<span class="option-title">Subscribe &amp; save</span>' +
+            '<span class="option-sub" id="optSubLine"></span>' +
           '</label>' +
           '<label class="option-card">' +
             '<input type="radio" name="variant" value="one">' +
             '<span class="option-title">One-time purchase</span>' +
-            '<span class="option-sub">' + money(p.price) + '</span>' +
+            '<span class="option-sub" id="optOneLine"></span>' +
           '</label>' +
         '</div>' +
         '<div class="pdp-buy-row">' +
@@ -696,8 +793,10 @@ function initProduct() {
             '<span id="qtyVal">1</span>' +
             '<button id="qtyUp" aria-label="Increase quantity">+</button>' +
           '</span>' +
-          '<button class="btn btn-primary pdp-add" id="pdpAdd">Add to cart &middot; <span id="pdpAddPrice">' + money(p.subPrice) + '</span></button>' +
+          '<button class="btn btn-primary pdp-add" id="pdpAdd">Add to cart &middot; <span id="pdpAddPrice"></span></button>' +
         '</div>' +
+        '<p class="pdp-tagline">' + esc(p.tagline) + '</p>' +
+        '<p class="pdp-desc">' + esc(p.description) + '</p>' +
         '<div class="acc-group pdp-accs">' +
           '<div class="acc-item">' +
             '<button class="acc-q" aria-expanded="false"><span>Ingredients</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
@@ -719,16 +818,46 @@ function initProduct() {
       '<div class="pairs-grid" id="pairsGrid"></div>' +
     '</section>';
 
-  // Variant selection
+  // Pack + plan selection
   var qty = 1;
   var variant = "sub";
+  var pack = PACKS[0];
   var qtyVal = document.getElementById("qtyVal");
-  var addPrice = document.getElementById("pdpAddPrice");
 
-  function refreshAddPrice() {
-    var unit = variant === "sub" ? p.subPrice : p.price;
-    addPrice.textContent = money(unit * qty);
+  function refresh() {
+    var unit = packPrice(p, pack, variant);
+    var was = Math.round(p.price * pack.qty * 100) / 100;
+    var off = Math.round(packOff(pack, variant) * 100);
+    var lineTotal = Math.round(unit * qty * 100) / 100;
+
+    document.getElementById("offerNow").textContent = money(unit);
+    document.getElementById("offerWas").textContent = money(was);
+    document.getElementById("pdpAddPrice").textContent = money(lineTotal);
+
+    var cell = "<span>SAVE " + off + "%</span>";
+    document.getElementById("saveTrack").innerHTML = cell.repeat(16);
+
+    document.getElementById("shipLine").textContent = lineTotal >= FREE_SHIP
+      ? "THIS ORDER SHIPS FREE"
+      : "FREE SHIPPING ON ORDERS OVER " + money(FREE_SHIP);
+
+    document.getElementById("optSubLine").textContent =
+      money(packPrice(p, pack, "sub")) + ", " + Math.round(pack.off * 100) + "% off, cancel anytime";
+    document.getElementById("optOneLine").textContent =
+      money(packPrice(p, pack, "one")) + ", " + Math.round(packOff(pack, "one") * 100) + "% off";
   }
+
+  root.querySelectorAll(".pack-pill").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      pack = packByKey(btn.getAttribute("data-pack"));
+      root.querySelectorAll(".pack-pill").forEach(function (b) {
+        var on = b === btn;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-checked", on ? "true" : "false");
+      });
+      refresh();
+    });
+  });
 
   root.querySelectorAll(".option-card input").forEach(function (input) {
     input.addEventListener("change", function () {
@@ -736,19 +865,22 @@ function initProduct() {
       root.querySelectorAll(".option-card").forEach(function (c) {
         c.classList.toggle("selected", c.contains(input));
       });
-      refreshAddPrice();
+      refresh();
     });
   });
 
   document.getElementById("qtyDown").addEventListener("click", function () {
-    qty = Math.max(1, qty - 1); qtyVal.textContent = qty; refreshAddPrice();
+    qty = Math.max(1, qty - 1); qtyVal.textContent = qty; refresh();
   });
   document.getElementById("qtyUp").addEventListener("click", function () {
-    qty = Math.min(9, qty + 1); qtyVal.textContent = qty; refreshAddPrice();
+    qty = Math.min(9, qty + 1); qtyVal.textContent = qty; refresh();
   });
   document.getElementById("pdpAdd").addEventListener("click", function () {
-    addToCart(p.id, variant, qty);
+    addToCart(p.id, variant, qty, pack.key);
   });
+
+  refresh();
+  initOfferClock();
 
   initAccordions(root);
 
@@ -793,7 +925,7 @@ function renderOrderSummary() {
       var p = getProductById(item.id);
       return '<div class="summary-line">' +
         '<span class="summary-thumb">' + productImg(p) + '<span class="summary-qty">' + item.qty + '</span></span>' +
-        '<span class="summary-name">' + esc(p.name) + '<em>' + (item.variant === "sub" ? "Subscription" : "One-time") + '</em></span>' +
+        '<span class="summary-name">' + esc(p.name) + '<em>' + esc(packLabel(item)) + (item.variant === "sub" ? "Subscription" : "One-time") + '</em></span>' +
         '<span>' + money(itemPrice(item) * item.qty) + '</span>' +
       '</div>';
     }).join("") +
