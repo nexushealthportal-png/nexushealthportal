@@ -39,7 +39,7 @@ function productImg(p, eager) {
 
 /* Star rating row */
 function starsSVG(rating) {
-  var star = '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path fill="#B9913F" d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.8z"/></svg>';
+  var star = '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path fill="#14ECC3" d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.8z"/></svg>';
   return '<span class="stars" aria-label="Rated ' + rating + ' out of 5">' + star.repeat(5) + "</span>";
 }
 
@@ -157,8 +157,8 @@ function shellHeaderHTML() {
   return '' +
   '<div class="announce">' +
     '<div class="announce-inner">' +
-      '<span>GLP-1 Support has arrived.</span>' +
-      '<a class="announce-btn" href="product.html?id=glp1-support">Check it out &rarr;</a>' +
+      '<span>GLP-1 Support just dropped</span>' +
+      '<a class="announce-btn" href="product.html?id=glp1-support">Shop now &rarr;</a>' +
     '</div>' +
   '</div>' +
   '<header class="site-header">' +
@@ -169,6 +169,7 @@ function shellHeaderHTML() {
       '<a class="wordmark" href="index.html">NEXUS</a>' +
       '<nav class="main-nav" aria-label="Main">' +
         '<a href="shop.html">Shop</a>' +
+        '<a href="shop.html?cat=peptides">Peptides</a>' +
         '<a href="shop.html?cat=daily">Daily</a>' +
         '<a href="shop.html?cat=performance">Performance</a>' +
         '<a href="shop.html?cat=vitality">Vitality</a>' +
@@ -183,6 +184,7 @@ function shellHeaderHTML() {
     '</div>' +
     '<div class="mobile-menu" id="mobileMenu">' +
       '<a href="shop.html">Shop</a>' +
+      '<a href="shop.html?cat=peptides">Peptides</a>' +
       '<a href="shop.html?cat=daily">Daily</a>' +
       '<a href="shop.html?cat=performance">Performance</a>' +
       '<a href="shop.html?cat=vitality">Vitality</a>' +
@@ -211,6 +213,7 @@ function shellFooterHTML() {
           '<p>Supplements, peptides, and protein for people who take their edge seriously.</p></div>' +
         '<div class="footer-col"><h4>Shop</h4>' +
           '<a href="shop.html">Shop all</a>' +
+          '<a href="shop.html?cat=peptides">Peptides</a>' +
           '<a href="shop.html?cat=daily">Daily Essentials</a>' +
           '<a href="shop.html?cat=performance">Performance</a>' +
           '<a href="shop.html?cat=vitality">Vitality</a></div>' +
@@ -506,7 +509,7 @@ function productCardHTML(p, opts) {
         '<span class="card-sub">' + esc(p.subtitle) + '</span>' +
         '<p class="card-tag">' + esc(p.tagline) + '</p>' +
         '<div class="card-rating">' + starsSVG(p.rating) + '<span>' + p.rating + ' (' + fmtCount(p.reviews) + ')</span></div>' +
-        '<div class="card-price"><strong>' + money(p.price) + '</strong><span>or ' + money(p.subPrice) + '/mo with subscription</span></div>' +
+        '<div class="card-price"><span class="from-lbl">From</span><strong>' + money(p.subPrice) + '/mo</strong></div>' +
       '</div>' +
     '</a>' +
     '<button class="btn btn-primary card-add" data-add="' + esc(p.id) + '">Add to cart</button>' +
@@ -533,7 +536,7 @@ function initHome() {
   // Product lineup scroller (dark section)
   var scroller = document.getElementById("lineupScroller");
   if (scroller) {
-    var lineupIds = ["glp1-support", "collagen-chocolate", "creatine-hydration", "ashwagandha-plus", "mushroom-coffee", "colostrum", "shilajit", "digestive-enzyme"];
+    var lineupIds = ["glp1-support", "collagen-chocolate", "colostrum", "creatine-hydration", "ashwagandha-plus", "shilajit", "mushroom-coffee", "digestive-enzyme"];
     scroller.innerHTML = lineupIds.map(function (id) {
       return productCardHTML(getProductById(id));
     }).join("");
@@ -600,6 +603,7 @@ var GOAL_TITLES = {
   focus: "Sharpen focus"
 };
 var CAT_TITLES = {
+  peptides: "Peptides",
   daily: "Daily Essentials",
   performance: "Performance",
   vitality: "Vitality"
