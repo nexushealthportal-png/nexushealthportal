@@ -210,7 +210,7 @@ function shellFooterHTML() {
     '<div class="footer-inner">' +
       '<div class="footer-grid">' +
         '<div class="footer-brand"><span class="footer-wordmark">NEXUS</span>' +
-          '<p>Supplements, peptides, and protein for people who take their edge seriously.</p></div>' +
+          '<p>Peptide and performance formulas, independently verified and shipped fast. Documented ingredients from a source you can trace.</p></div>' +
         '<div class="footer-col"><h4>Shop</h4>' +
           '<a href="shop.html">Shop all</a>' +
           '<a href="shop.html?cat=peptides">Peptides</a>' +
@@ -218,7 +218,7 @@ function shellFooterHTML() {
           '<a href="shop.html?cat=performance">Performance</a>' +
           '<a href="shop.html?cat=vitality">Vitality</a></div>' +
         '<div class="footer-col"><h4>Learn</h4>' +
-          '<a href="index.html#science">The science</a>' +
+          '<a href="index.html#science">Quality &amp; testing</a>' +
           '<a href="index.html#experts">Experts</a>' +
           '<a href="index.html#faq">FAQ</a></div>' +
         '<div class="footer-col"><h4>Support</h4>' +
@@ -227,7 +227,7 @@ function shellFooterHTML() {
           '<a href="index.html#faq">Returns</a></div>' +
       '</div>' +
       '<div class="footer-fine">' +
-        '<p>These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat, cure, or prevent any disease.</p>' +
+        '<p>Nothing on this site constitutes medical advice. These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat, cure, or prevent any disease.</p>' +
         '<p>&copy; 2026 Nexus Health. All rights reserved.</p>' +
       '</div>' +
     '</div>' +
@@ -651,7 +651,7 @@ function initHome() {
       if (!form.checkValidity()) { form.reportValidity(); return; }
       var done = document.createElement("p");
       done.className = "guide-done";
-      done.textContent = "Check your inbox. It's on the way.";
+      done.textContent = "You're on the list.";
       form.replaceWith(done);
     });
   }
@@ -856,6 +856,10 @@ function initProduct() {
             '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.4-5.9M20 12a8 8 0 0 1-13.4 5.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M18.5 2.5V7h-4.5M5.5 21.5V17H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
             '<span>Recurring subscription (see below for details)</span>' +
           '</div>' +
+          '<div class="perk">' +
+            '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 3v4h4M10 12h5M10 16h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' +
+            '<span>COA for your exact batch, available on request</span>' +
+          '</div>' +
         '</div>' +
         '<h3 class="pdp-select-head">Select your quantity</h3>' +
         '<div class="pack-row" id="packRow" role="radiogroup" aria-label="Quantity">' +
@@ -901,7 +905,7 @@ function initProduct() {
           '</div>' +
           '<div class="acc-item">' +
             '<button class="acc-q" aria-expanded="false"><span>Shipping &amp; returns</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
-            '<div class="acc-a"><p>Free shipping on orders over $75, otherwise a flat $6.95. Orders ship within 1 business day. Not feeling it? Email us within 30 days for a full refund, even on opened products.</p></div>' +
+            '<div class="acc-a"><p>In-stock orders are fulfilled within 1 business day and ship tracked, in plain, tamper-evident packaging. Free shipping over $75, otherwise a flat $6.95. Not feeling it? Email us within 30 days for a full refund, even on opened products.</p></div>' +
           '</div>' +
         '</div>' +
       '</div>' +
