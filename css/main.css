@@ -1401,3 +1401,138 @@ main section > .container > h2,
 .lineup-grid .card-price strong, .lineup-grid .card-price .from-lbl {
   font-family: "Space Mono", monospace;
 }
+
+/* ============================================================
+   INTERACTION LAYER
+   Ticker, parallax support, card spotlight, magnetic CTAs,
+   add-to-cart feedback, sticky PDP buy bar.
+   ============================================================ */
+
+/* --- Ticker: blue strip, mono, infinite scroll --- */
+.ticker {
+  background: var(--blue);
+  overflow: hidden;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255,255,255,0.14);
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  width: max-content;
+  animation: ticker-scroll 26s linear infinite;
+}
+.ticker-track span {
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+}
+.ticker-track i { font-style: normal; color: var(--mint); font-weight: 700; }
+.ticker:hover .ticker-track { animation-play-state: paused; }
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+}
+
+/* --- Parallax support --- */
+.hero-lux-bg img { will-change: transform; transform: scale(1.1); }
+
+/* --- Card spotlight: blue glow follows the cursor --- */
+.spot { position: relative; }
+.spot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(26, 4, 255, 0.28), rgba(20, 236, 195, 0.05) 45%, transparent 70%);
+}
+.spot:hover::after { opacity: 1; }
+
+/* --- Magnetic CTAs --- */
+.hero-lux .btn, .lineup-grid .card-add, .card-add, .pdp-add, .lineup-foot .btn, .sticky-add {
+  transition: transform 0.18s ease-out, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* --- Add-to-cart feedback --- */
+.card-add.added, .pdp-add.added, .sticky-add.added {
+  background: var(--mint) !important;
+  border-color: var(--mint) !important;
+  color: #000 !important;
+}
+@keyframes badge-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.45); }
+  100% { transform: scale(1); }
+}
+.cart-count.pulse { animation: badge-pop 0.45s ease; }
+
+/* --- Sticky PDP buy bar --- */
+.sticky-buy {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 70;
+  background: rgba(5, 5, 5, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line-soft);
+  transform: translateY(110%);
+  transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.sticky-buy.show { transform: translateY(0); }
+.sticky-buy-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 12px var(--pad);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.sticky-thumb {
+  width: 46px; height: 46px;
+  flex-shrink: 0;
+  background: #101010;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.sticky-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.sticky-info { display: flex; flex-direction: column; min-width: 0; }
+.sticky-info b {
+  font-family: "Archivo", sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sticky-info em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.sticky-price {
+  margin-left: auto;
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--mint);
+  white-space: nowrap;
+}
+.sticky-add { padding: 13px 26px !important; flex-shrink: 0; }
+@media (max-width: 560px) {
+  .sticky-info em { display: none; }
+  .sticky-add { padding: 12px 18px !important; font-size: 11px; }
+}

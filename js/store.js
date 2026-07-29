@@ -455,16 +455,104 @@ function initQuiz() {
 
 function initReveal() {
   if (!("IntersectionObserver" in window)) return;
-  var sel = ".stats-band, .feature-grid, .timeline-card, .cat-card, .expert-card, .review-card, .goal-tile, .science-grid, .guide-card, .lineup-head, .acc-item, .promo-card";
+  var sel = ".stats-band, .feature-grid, .timeline-card, .cat-card, .expert-card, .review-card, .goal-tile, .science-grid, .guide-card, .lineup-head, .acc-item, .promo-card, .lineup-grid .product-card";
   var els = [].slice.call(document.querySelectorAll(sel));
   if (!els.length) return;
-  els.forEach(function (el) { el.classList.add("reveal"); });
+  els.forEach(function (el) {
+    el.classList.add("reveal");
+    // Stagger siblings so grids cascade in rather than pop as a block
+    var sibs = [].slice.call(el.parentElement.children).filter(function (c) {
+      return c.classList.contains("reveal");
+    });
+    var idx = sibs.indexOf(el);
+    if (idx > 0) el.style.transitionDelay = Math.min(idx * 70, 420) + "ms";
+  });
   var obs = new IntersectionObserver(function (entries) {
     entries.forEach(function (en) {
       if (en.isIntersecting) { en.target.classList.add("in"); obs.unobserve(en.target); }
     });
   }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
   els.forEach(function (el) { obs.observe(el); });
+}
+
+/* ============================================================
+   Motion layer: parallax, card spotlight, magnetic CTAs
+   All of it sits behind a reduced-motion check.
+   ============================================================ */
+
+function prefersReducedMotion() {
+  return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function initMotion() {
+  if (prefersReducedMotion()) return;
+
+  // 1. Hero parallax: background drifts slower than the page
+  var heroImg = document.querySelector(".hero-lux-bg img");
+  if (heroImg) {
+    var heroH = 0, ticking = false;
+    function measure() { heroH = heroImg.closest(".hero-lux").offsetHeight; }
+    function apply() {
+      ticking = false;
+      var y = window.scrollY;
+      if (y <= heroH) heroImg.style.transform = "translate3d(0," + Math.round(y * 0.28) + "px,0) scale(1.1)";
+    }
+    measure();
+    apply();
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(apply); }
+    }, { passive: true });
+  }
+
+  // 2 + 3. Cursor spotlight on cards, magnetic CTAs. Delegated from the
+  // document so cards re-rendered by filters keep the behavior.
+  var spotSel = ".product-card, .goal-tile, .cat-card, .offer-box, .member-card";
+  var magSel = ".hero-lux .btn, .lineup-grid .card-add, .card-add, .pdp-add, .lineup-foot .btn, .sticky-add";
+  var lastMag = null;
+
+  document.addEventListener("mousemove", function (e) {
+    if (!e.target || !e.target.closest) return;
+
+    var card = e.target.closest(spotSel);
+    if (card) {
+      var r = card.getBoundingClientRect();
+      card.classList.add("spot");
+      card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+      card.style.setProperty("--my", (e.clientY - r.top) + "px");
+    }
+
+    var btn = e.target.closest(magSel);
+    if (btn !== lastMag && lastMag) { lastMag.style.transform = ""; }
+    lastMag = btn;
+    if (btn) {
+      var b = btn.getBoundingClientRect();
+      var dx = (e.clientX - b.left - b.width / 2) / (b.width / 2);
+      var dy = (e.clientY - b.top - b.height / 2) / (b.height / 2);
+      btn.style.transform = "translate(" + Math.round(dx * 5) + "px," + Math.round(dy * 4) + "px)";
+    }
+  }, { passive: true });
+}
+
+/* Cart badge pulse + button confirmation after any add */
+function addFeedback(btn) {
+  var badge = document.getElementById("cartCount");
+  if (badge) {
+    badge.classList.remove("pulse");
+    void badge.offsetWidth; // restart animation
+    badge.classList.add("pulse");
+  }
+  if (btn && !btn.dataset.busy) {
+    btn.dataset.busy = "1";
+    var original = btn.innerHTML;
+    btn.classList.add("added");
+    btn.innerHTML = "Added &#10003;";
+    setTimeout(function () {
+      btn.classList.remove("added");
+      btn.innerHTML = original;
+      delete btn.dataset.busy;
+    }, 1400);
+  }
 }
 
 function initCounters() {
@@ -520,6 +608,7 @@ function bindCardAdds(container) {
   container.querySelectorAll("[data-add]").forEach(function (btn) {
     btn.addEventListener("click", function () {
       addToCart(btn.getAttribute("data-add"), "one", 1);
+      addFeedback(btn);
     });
   });
 }
@@ -881,10 +970,46 @@ function initProduct() {
   });
   document.getElementById("pdpAdd").addEventListener("click", function () {
     addToCart(p.id, variant, qty, pack.key);
+    addFeedback(document.getElementById("pdpAdd"));
   });
 
   refresh();
   initOfferClock();
+
+  // Sticky buy bar: slides up when the main buy row scrolls out of view
+  var bar = document.createElement("div");
+  bar.className = "sticky-buy";
+  bar.innerHTML =
+    '<div class="sticky-buy-inner">' +
+      '<span class="sticky-thumb">' + productImg(p, true) + '</span>' +
+      '<span class="sticky-info"><b>' + esc(p.name) + '</b><em id="stickyMeta"></em></span>' +
+      '<span class="sticky-price" id="stickyPrice"></span>' +
+      '<button class="btn btn-primary sticky-add" id="stickyAdd">Add to cart</button>' +
+    '</div>';
+  document.body.appendChild(bar);
+
+  function refreshSticky() {
+    var unit = packPrice(p, pack, variant);
+    document.getElementById("stickyPrice").textContent = money(Math.round(unit * qty * 100) / 100);
+    document.getElementById("stickyMeta").textContent =
+      pack.label + " · " + (variant === "sub" ? "Subscription" : "One-time") + (qty > 1 ? " · ×" + qty : "");
+  }
+  var _refresh = refresh;
+  refresh = function () { _refresh(); refreshSticky(); };
+  refreshSticky();
+
+  document.getElementById("stickyAdd").addEventListener("click", function () {
+    addToCart(p.id, variant, qty, pack.key);
+    addFeedback(document.getElementById("stickyAdd"));
+  });
+
+  if ("IntersectionObserver" in window) {
+    var buyRow = root.querySelector(".pdp-buy-row");
+    var barObs = new IntersectionObserver(function (entries) {
+      bar.classList.toggle("show", !entries[0].isIntersecting && entries[0].boundingClientRect.top < 0);
+    }, { threshold: 0 });
+    barObs.observe(buyRow);
+  }
 
   initAccordions(root);
 
@@ -991,13 +1116,15 @@ function initCheckout() {
 
 document.addEventListener("DOMContentLoaded", function () {
   initShell();
-  initReveal();
-  initCounters();
   var page = document.body.getAttribute("data-page");
   if (page === "home") initHome();
   else if (page === "shop") initShop();
   else if (page === "product") initProduct();
   else if (page === "checkout") initCheckout();
+  // Run after the page renderers so dynamically built cards are included
+  initReveal();
+  initCounters();
+  initMotion();
 });
 
 /* Keep the cart badge fresh after bfcache restores and cross-tab changes */
