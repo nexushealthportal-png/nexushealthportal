@@ -2213,3 +2213,120 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
   .footer-legal { flex-direction: column; align-items: flex-start; gap: 14px; }
   .footer-mega { font-size: clamp(30px, 12vw, 72px); padding: 0 16px; }
 }
+
+/* ============================================================
+   BENTO CARD GRID
+   Large rounded image cards: photo background, pill tags, big
+   headline, and a circular arrow that fills on hover.
+   ============================================================ */
+.cards-sec { padding-top: 0 !important; }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.bento {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 400px;
+  padding: 28px;
+  border-radius: 16px;
+  overflow: hidden;
+  isolation: isolate;
+  color: #fff;
+  background: #0B0B0B;
+  transition: transform .4s cubic-bezier(.2,.7,.3,1);
+}
+.bento-img {
+  position: absolute; inset: 0; z-index: -2;
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .6s cubic-bezier(.2,.7,.3,1);
+}
+.bento:hover .bento-img { transform: scale(1.04); }
+
+.bento::before {                      /* readability scrim */
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(198deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.42) 42%, rgba(0,0,0,.86) 100%);
+  transition: background .4s ease;
+}
+.bento:hover { transform: translateY(-4px); }
+.bento:hover::before {
+  background: linear-gradient(198deg, rgba(0,0,0,.10) 0%, rgba(0,0,0,.36) 42%, rgba(0,0,0,.84) 100%);
+}
+
+.bento-wide { grid-column: 1 / -1; min-height: 330px; }
+
+.bento-tags {
+  position: absolute; top: 24px; left: 28px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.bento-tags span {
+  font-family: "Space Mono", monospace;
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: 6px 11px; border-radius: 999px;
+}
+.tag-blue { background: var(--blue); color: #fff; }
+.tag-mint { background: var(--mint); color: #000; }
+.tag { background: rgba(255,255,255,.16); color: #fff; backdrop-filter: blur(6px); }
+
+.bento-body { max-width: 78%; }
+.bento-body h3 {
+  font-weight: 900;
+  font-size: clamp(26px, 2.7vw, 38px);
+  line-height: .98;
+  letter-spacing: -.025em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.bento-body p {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: rgba(255,255,255,.82);
+  max-width: 330px;
+}
+.bento-wide .bento-body { max-width: 62%; }
+.bento-wide .bento-body p { max-width: 460px; }
+
+.bento-go {
+  position: absolute; right: 26px; bottom: 26px;
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; color: #000;
+  transition: transform .3s cubic-bezier(.2,.7,.3,1), background .3s ease, color .3s ease;
+}
+.bento:hover .bento-go { transform: translateX(4px); background: var(--blue); color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bento, .bento-go { transition: none; }
+  .bento:hover { transform: none; }
+}
+
+@media (max-width: 860px) {
+  .card-grid { grid-template-columns: 1fr; gap: 12px; }
+  .bento { min-height: 320px; padding: 22px; }
+  .bento-wide { min-height: 300px; }
+  .bento-tags { top: 20px; left: 22px; }
+  .bento-body, .bento-wide .bento-body { max-width: 100%; }
+  .bento-go { width: 46px; height: 46px; right: 20px; bottom: 20px; }
+  .bento-body h3, .bento-body p { padding-right: 62px; }
+}
+
+/* ============================================================
+   NAV FIT
+   The desktop nav needs ~1020px but only collapsed below 860px,
+   so links wrapped to two lines in between.
+   ============================================================ */
+.main-nav a, .nav-about { white-space: nowrap; }
+
+@media (max-width: 1020px) {
+  .main-nav { display: none; }
+  .nav-toggle { display: block; }
+  .nav-about { display: none; }
+  .mobile-menu.open { display: flex; }
+}
