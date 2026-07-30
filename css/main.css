@@ -1875,3 +1875,42 @@ body.gate-lock { overflow: hidden; }
   .spec-row { grid-template-columns: 1fr; }
   .spec-table th { width: 46%; }
 }
+
+/* ============================================================
+   MOBILE PASS
+   Appended last so it wins the cascade.
+   ============================================================ */
+@media (max-width: 600px) {
+
+  /* Buy row: the add button was overflowing its card. Stack it. */
+  .pdp-buy-row { flex-wrap: wrap; gap: 12px; }
+  .pdp-buy-row .qty-stepper.qty-lg { flex: 0 0 auto; }
+  .pdp-add { flex: 1 1 100%; width: 100%; min-width: 0; }
+
+  /* Full-width CTAs read better than ragged ones on a narrow screen */
+  .hero-tech-cta { flex-direction: column; align-items: stretch; }
+  .hero-tech-cta .btn { width: 100%; }
+
+  .coa-form, .guide-form { flex-direction: column; }
+  .coa-form input, .coa-form .btn,
+  .guide-form input, .guide-form .btn { width: 100%; flex: 1 1 auto; }
+
+  /* Footer: even columns instead of a lopsided 2:1 split */
+  .footer-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 30px 18px; }
+  .footer-brand { grid-column: 1 / -1; }
+
+  /* Sticky bar: reclaim room for the product name */
+  .sticky-buy-inner { gap: 12px; padding: 10px 16px; }
+  .sticky-thumb { display: none; }
+  .sticky-info { flex: 1 1 auto; min-width: 0; }
+  .sticky-info b { font-size: 14px; }
+  .sticky-price { font-size: 15px; margin-left: 0; }
+
+  /* Spec table: give the values more room */
+  .spec-table th { width: 42%; font-size: 10px; }
+  .spec-table td { font-size: 13px; }
+
+  /* RUO gate: keep the actions comfortable */
+  .ruo-actions { flex-direction: column; }
+  .ruo-actions .btn { width: 100%; }
+}
