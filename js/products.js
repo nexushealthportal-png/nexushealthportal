@@ -27,7 +27,7 @@ const PRODUCTS = [
     description: "GHK-Cu is the copper(II) complex of the tripeptide glycyl-L-histidyl-L-lysine, used in in-vitro investigation of collagen synthesis, fibroblast activity, and metalloprotein chemistry. Supplied as a lyophilized solid with identity confirmed by LC-MS and purity determined by HPLC-UV.",
     apps: ["Extracellular matrix studies", "Fibroblast culture models", "Metalloprotein chemistry"],
     price: 48.00,
-    img: "dropper-white"
+    img: "vial-row"
   },
   {
     id: "ghk",
@@ -49,7 +49,7 @@ const PRODUCTS = [
     description: "GHK is the free tripeptide corresponding to the copper complex GHK-Cu. It is commonly run as a copper-free control alongside GHK-Cu to separate peptide-driven effects from metal-driven effects in culture. Identity confirmed by LC-MS.",
     apps: ["Control for GHK-Cu experiments", "Peptide reference standard", "Chelation studies"],
     price: 39.00,
-    img: "protein-scoop"
+    img: "vial-carousel"
   },
   {
     id: "glutathione-reduced",
@@ -71,7 +71,7 @@ const PRODUCTS = [
     description: "Reduced glutathione is the principal intracellular thiol antioxidant and a standard reagent in redox biology. Used to prepare standard curves for GSH/GSSG assays, as a reducing agent in buffers, and as a substrate in glutathione S-transferase work.",
     apps: ["GSH/GSSG ratio assays", "Redox buffer preparation", "Glutathione S-transferase substrate"],
     price: 34.00,
-    img: "jar-white"
+    img: "amber-reagent"
   },
   {
     id: "glutathione-oxidized",
@@ -93,7 +93,7 @@ const PRODUCTS = [
     description: "Oxidized glutathione is the disulfide-linked dimer of GSH. It is used as the oxidized reference in GSH/GSSG ratio determinations, in redox potential calibration, and as a substrate for glutathione reductase assays.",
     apps: ["GSH/GSSG standard curves", "Glutathione reductase assays", "Redox potential calibration"],
     price: 42.00,
-    img: "bottle-white"
+    img: "amber-shelf"
   },
   {
     id: "nac",
@@ -115,7 +115,7 @@ const PRODUCTS = [
     description: "N-Acetyl-L-cysteine is a cell-permeable thiol used in vitro as a reactive oxygen species scavenger, a cysteine source in culture media, and a mucolytic reagent in sample preparation. Supplied as a crystalline solid.",
     apps: ["ROS scavenging in culture", "Cysteine supplementation", "Sample liquefaction"],
     price: 28.00,
-    img: "capsules-bottle-grey"
+    img: "flask-dark"
   },
   {
     id: "bacteriostatic-water",
@@ -137,7 +137,7 @@ const PRODUCTS = [
     description: "Sterile water containing 0.9% benzyl alcohol as a bacteriostatic agent, allowing a sealed vial to be entered multiple times during a work session. Standard laboratory diluent for reconstituting lyophilized powders.",
     apps: ["Reconstituting lyophilized reagents", "Multi-dose stock preparation", "General laboratory diluent"],
     price: 12.00,
-    img: "omega-bottle"
+    img: "vial-tray"
   },
   {
     id: "sterile-vials",
@@ -159,7 +159,7 @@ const PRODUCTS = [
     description: "Depyrogenated Type I borosilicate vials with butyl rubber stoppers and aluminium crimp seals. Suitable for storing reconstituted stocks and aliquoting lyophilized material under sterile technique.",
     apps: ["Stock aliquoting", "Lyophilized storage", "Sterile sample handling"],
     price: 26.00,
-    img: "bottles-pedestal"
+    img: "lab-glassware"
   },
   {
     id: "syringe-filters",
@@ -181,7 +181,7 @@ const PRODUCTS = [
     description: "Sterilizing-grade 0.22 µm polyethersulfone syringe filters with low protein binding and luer-lock fittings. Used to sterile-filter reconstituted aqueous stocks and buffers prior to use in culture.",
     apps: ["Sterile filtration of stocks", "Buffer clarification", "Culture media preparation"],
     price: 34.00,
-    img: "shaker-tape"
+    img: "hplc-autosampler"
   }
 ];
 

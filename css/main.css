@@ -192,10 +192,7 @@ section { padding: 96px 0 0; }
 /* ============ Dark lineup section ============ */
 .lineup-wrap { padding: 0 var(--pad); max-width: var(--maxw); margin: 96px auto 0; }
 .lineup-section {
-  background-image:
-    linear-gradient(150deg, rgba(8, 14, 28, 0.97), rgba(16, 24, 44, 0.95) 55%, rgba(16, 24, 44, 0.93)),
-    url("../img/gym-dark.webp");
-  background-size: cover; background-position: center;
+  background: #0B0B0B;
   border-radius: var(--radius);
   color: #fff; padding: 72px 0 56px; overflow: hidden;
 }
