@@ -2633,3 +2633,88 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
 .lineup-lux.sec-light { padding-bottom: clamp(40px, 4.4vw, 62px); }
 .site-footer .footer-inner { padding-top: clamp(30px, 3.2vw, 44px); }
 .footer-mega { margin-bottom: clamp(26px, 3vw, 40px); }
+
+
+/* ============================================================
+   SHARED LOCKUP
+   One definition for the wordmark, used by the header and the
+   footer. Everything is em-relative so it scales identically at
+   26px or 180px, and the two can never drift apart again.
+   ============================================================ */
+.lockup {
+  font-family: "Archivo", "Inter", sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+  font-style: normal;
+  display: inline-block;
+  line-height: 0.94;
+}
+.lockup em {
+  font-style: normal;
+  font-weight: 500;                 /* Medium, not Black */
+  font-size: 0.52em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-left: 0.115em;             /* was 3px, now scales */
+  vertical-align: 0.077em;          /* was 2px, now scales */
+}
+.lockup::after { content: none; }
+
+/* Footer: the lockup fills the row, sized by initMegaFit() */
+.footer-mega {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: clamp(26px, 3vw, 40px);
+}
+.footer-mega .lockup { display: inline-block; font-size: 100px; }
+
+/* ============================================================
+   DOT TEXTURE SYSTEM
+   The grain on the violet band, extracted into a reusable layer
+   so any section can carry it in any colour. Sits on ::before
+   behind content, with isolation so z-index -1 can't escape
+   behind the section's own background.
+   ============================================================ */
+:root {
+  --dot-gap: 3px;
+  --dot-r: .5px;
+  --dot-c: rgba(255,255,255,.14);
+}
+
+.dotted { position: relative; isolation: isolate; }
+.dotted::before {
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(var(--dot-c) var(--dot-r), transparent var(--dot-r));
+  background-size: var(--dot-gap) var(--dot-gap);
+}
+
+/* colour variants */
+.dotted--ink    { --dot-c: rgba(10,11,16,.16); }     /* dark dots on paper  */
+.dotted--mint   { --dot-c: rgba(20,236,195,.20); }
+.dotted--violet { --dot-c: rgba(109,40,255,.26); }
+.dotted--blue   { --dot-c: rgba(26,4,255,.30); }
+
+/* density variants */
+.dotted--wide  { --dot-gap: 5px; --dot-r: .6px; }
+.dotted--tight { --dot-gap: 2.5px; }
+
+/* a soft fade so the field never reads as a flat screen */
+.dotted--fade::before {
+  mask-image: radial-gradient(ellipse 90% 78% at 50% 40%, #000 12%, transparent 82%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 78% at 50% 40%, #000 12%, transparent 82%);
+}
+.dotted--top::before {
+  mask-image: linear-gradient(180deg, #000 0%, transparent 76%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 76%);
+}
+.dotted--bottom::before {
+  mask-image: linear-gradient(0deg, #000 0%, transparent 72%);
+  -webkit-mask-image: linear-gradient(0deg, #000 0%, transparent 72%);
+}

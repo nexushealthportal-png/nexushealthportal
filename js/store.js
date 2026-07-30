@@ -146,7 +146,7 @@ function shellHeaderHTML() {
       '<button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">' +
         '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
       '</button>' +
-      '<a class="wordmark" href="index.html">NEXUS <em>Research</em></a>' +
+      '<a class="wordmark lockup" href="index.html">NEXUS <em>Research</em></a>' +
       '<nav class="main-nav" aria-label="Main">' +
         '<a href="shop.html">Catalog</a>' +
         '<a href="shop.html?cat=peptides">Peptides</a>' +
@@ -184,17 +184,12 @@ function shellHeaderHTML() {
 
 function shellFooterHTML() {
   return '' +
-  '<footer class="site-footer">' +
+  '<footer class="site-footer dotted dotted--mint dotted--top">' +
     '<div class="footer-inner">' +
 
-      /* Oversized wordmark. SVG with textLength so it fills the row exactly
-         at any viewport width instead of guessing with a font-size clamp. */
-      '<svg class="footer-mega" viewBox="0 -4 916 96" role="img" aria-label="Nexus Research" preserveAspectRatio="xMidYMid meet">' +
-        '<text x="0" y="86" font-family="Archivo, sans-serif" font-weight="900">' +
-          '<tspan font-size="118" letter-spacing="-4" fill="#ffffff">NEXUS</tspan>' +
-          '<tspan font-size="61" letter-spacing="9.8" fill="#14ECC3" dx="26">RESEARCH</tspan>' +
-        '</text>' +
-      '</svg>' +
+      /* Same .lockup markup and CSS as the header, so the letterforms,
+         weights and spacing can never drift apart. initMegaFit() scales it. */
+      '<div class="footer-mega"><span class="lockup">NEXUS <em>Research</em></span></div>' +
 
       '<div class="footer-grid">' +
         '<div class="footer-col"><h4>Catalog</h4>' +
@@ -312,6 +307,31 @@ function renderCartUI() {
   });
 }
 
+
+/* Scale the footer lockup to fill its row exactly. Measuring beats guessing
+   with a font-size clamp, which is what let it overflow before. */
+function initMegaFit() {
+  var wrap = document.querySelector(".footer-mega");
+  if (!wrap) return;
+  var mark = wrap.querySelector(".lockup");
+  if (!mark) return;
+
+  function fit() {
+    // Measure shrink-to-fit. As a block element its width would just report
+    // the container, which is what made it under-fill.
+    mark.style.display = "inline-block";
+    mark.style.fontSize = "100px";
+    var natural = mark.getBoundingClientRect().width;
+    if (!natural) return;
+    var avail = wrap.clientWidth;
+    mark.style.fontSize = Math.max(20, Math.floor(avail / natural * 100)) + "px";
+  }
+
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  window.addEventListener("resize", fit);
+}
+
 function initShell() {
   document.body.insertAdjacentHTML("afterbegin", shellHeaderHTML());
   document.body.insertAdjacentHTML("beforeend", shellFooterHTML());
@@ -331,6 +351,7 @@ function initShell() {
   });
 
   renderCartUI();
+  initMegaFit();
 }
 
 /* ============================================================
