@@ -189,11 +189,10 @@ function shellFooterHTML() {
 
       /* Oversized wordmark. SVG with textLength so it fills the row exactly
          at any viewport width instead of guessing with a font-size clamp. */
-      '<svg class="footer-mega" viewBox="0 0 1000 118" role="img" aria-label="Nexus Research" preserveAspectRatio="xMidYMid meet">' +
-        '<text x="0" y="96" textLength="1000" lengthAdjust="spacingAndGlyphs" ' +
-              'font-family="Archivo, sans-serif" font-weight="900" font-size="118" letter-spacing="-4">' +
-          '<tspan fill="#ffffff">NEXUS</tspan>' +
-          '<tspan fill="#14ECC3"> RESEARCH</tspan>' +
+      '<svg class="footer-mega" viewBox="0 -4 916 96" role="img" aria-label="Nexus Research" preserveAspectRatio="xMidYMid meet">' +
+        '<text x="0" y="86" font-family="Archivo, sans-serif" font-weight="900">' +
+          '<tspan font-size="118" letter-spacing="-4" fill="#ffffff">NEXUS</tspan>' +
+          '<tspan font-size="61" letter-spacing="9.8" fill="#14ECC3" dx="26">RESEARCH</tspan>' +
         '</text>' +
       '</svg>' +
 

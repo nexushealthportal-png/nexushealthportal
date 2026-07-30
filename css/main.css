@@ -2623,3 +2623,13 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
 .sec-light .faq-head,
 .sec-light .sec-head,
 .sec-light .reviews-head { color: var(--paper-ink); }
+
+/* ============================================================
+   SPACING TRIM
+   Measured gaps that read as dead space:
+   catalog button -> cards 92px, footer top -> wordmark 73px.
+   ============================================================ */
+.lineup-foot { margin-top: clamp(28px, 3vw, 40px); }
+.lineup-lux.sec-light { padding-bottom: clamp(40px, 4.4vw, 62px); }
+.site-footer .footer-inner { padding-top: clamp(30px, 3.2vw, 44px); }
+.footer-mega { margin-bottom: clamp(26px, 3vw, 40px); }
