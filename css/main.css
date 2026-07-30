@@ -1603,7 +1603,7 @@ body.gate-lock { overflow: hidden; }
 .hero-tech .hero-eyebrow { display: block; color: var(--mint); margin-bottom: 22px; }
 .hero-tech h1 {
   font-weight: 900;
-  font-size: clamp(40px, 7vw, 88px);
+  font-size: clamp(30px, 9vw, 88px);
   line-height: 0.94;
   letter-spacing: -0.03em;
   text-transform: uppercase;
@@ -1898,6 +1898,9 @@ body.gate-lock { overflow: hidden; }
   /* Footer: even columns instead of a lopsided 2:1 split */
   .footer-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 30px 18px; }
   .footer-brand { grid-column: 1 / -1; }
+  /* Support holds a long email address, so give it the full row */
+  .footer-col:last-child { grid-column: 1 / -1; }
+  .footer-col a { overflow-wrap: anywhere; }
 
   /* Sticky bar: reclaim room for the product name */
   .sticky-buy-inner { gap: 12px; padding: 10px 16px; }
@@ -1913,4 +1916,30 @@ body.gate-lock { overflow: hidden; }
   /* RUO gate: keep the actions comfortable */
   .ruo-actions { flex-direction: column; }
   .ruo-actions .btn { width: 100%; }
+}
+
+/* ============================================================
+   HEADER FIT
+   A wordmark must never wrap. At 375px it needed 200px but only
+   177px was free, so "RESEARCH" dropped to a second line and
+   pushed the header to 81px tall.
+   ============================================================ */
+.wordmark { white-space: nowrap; }
+
+@media (max-width: 600px) {
+  .nav-inner { padding: 0 16px; gap: 12px; }
+  .wordmark { font-size: 21px; }
+  .wordmark em { font-size: 0.5em; letter-spacing: 0.12em; }
+  .cart-btn { padding: 8px 14px; }
+  .cart-btn span:first-of-type { display: none; }   /* icon + count only */
+}
+@media (max-width: 360px) {
+  .wordmark { font-size: 19px; }
+  .wordmark em { display: none; }                   /* NEXUS alone on tiny screens */
+}
+
+/* Long single words in display type must never clip on narrow screens */
+.hero-tech h1, .sec-head, .pdp-title, .faq-head,
+.promise-card h3, .spec-card h3, .lineup-grid .card-name {
+  overflow-wrap: break-word;
 }
