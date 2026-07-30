@@ -48,11 +48,11 @@ function initGate() {
     '<div class="ruo-panel" role="dialog" aria-modal="true" aria-labelledby="ruoTitle">' +
       '<span class="ruo-kicker">Research use only</span>' +
       '<h2 id="ruoTitle">You must be 21 or older to enter.</h2>' +
-      '<p>Nexus Research supplies laboratory reagents and consumables strictly for ' +
-      '<strong>in-vitro research use</strong>. Our products are not drugs, foods, cosmetics, ' +
+      '<p>Nexus Research sells lab chemicals and lab supplies only for ' +
+      '<strong>research in a lab</strong>. Our products are not drugs, food, cosmetics, ' +
       'or supplements, and are <strong>not for human or veterinary use</strong>.</p>' +
-      '<p>By entering you confirm that you are at least 21 years old, that you are ' +
-      'qualified to handle research chemicals, and that you accept our Research Use ' +
+      '<p>By entering you confirm that you are 21 or older, that you are ' +
+      'trained to handle research chemicals, and that you accept our Research Use ' +
       'Only Agreement and Terms.</p>' +
       '<div class="ruo-actions">' +
         '<button class="btn btn-primary" id="ruoEnter">I am 21 or older, and I accept</button>' +
@@ -215,7 +215,7 @@ function shellFooterHTML() {
           '<a href="index.html#faq">FAQ</a>' +
           '<a href="shipping.html">Returns</a></div>' +
         '<div class="footer-col"><h4>Get in touch</h4>' +
-          '<p class="footer-note">Laboratory reagents and consumables, independently tested with a certificate of analysis on every lot.</p>' +
+          '<p class="footer-note">Lab chemicals and supplies, tested by an outside lab, with a test report on every batch.</p>' +
           '<p class="footer-badges"><span>HPLC + LC-MS</span><span>Tamper-sealed</span></p></div>' +
       '</div>' +
 
@@ -845,7 +845,7 @@ function initProduct() {
 
         '<div class="ruo-flag">' +
           '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l9 16H3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9v5M12 16.5v.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
-          '<span>For in-vitro laboratory research only. Not a drug, food, cosmetic, or supplement. Not for human or veterinary use.</span>' +
+          '<span>For lab research only. Not a drug, food, cosmetic, or supplement. Not for human or veterinary use.</span>' +
         '</div>' +
 
         '<div class="pdp-buy-block">' +
@@ -859,7 +859,7 @@ function initProduct() {
             '<button class="btn btn-primary pdp-add" id="pdpAdd">Add to order &middot; <span id="pdpAddPrice">' + money(p.price) + '</span></button>' +
           '</div>' +
           '<div class="pdp-perks">' +
-            '<div class="perk"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 3v4h4M10 12h5M10 16h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Certificate of analysis for lot ' + esc(p.lot) + ', on request</span></div>' +
+            '<div class="perk"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 3v4h4M10 12h5M10 16h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Test report for batch ' + esc(p.lot) + ', on request</span></div>' +
             '<div class="perk"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M3 7.2l9-4 9 4v9.6l-9 4-9-4V7.2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span>Ships in 1 business day, plain tamper-evident packaging</span></div>' +
           '</div>' +
         '</div>' +
@@ -883,7 +883,7 @@ function initProduct() {
           '</div>' +
           '<div class="acc-item">' +
             '<button class="acc-q" aria-expanded="false"><span>Shipping &amp; returns</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
-            '<div class="acc-a"><p>In-stock items are dispatched within 1 business day and ship tracked in plain, tamper-evident packaging. Free shipping on orders over ' + money(FREE_SHIP) + ', otherwise a flat ' + money(SHIP_COST) + '. Unopened items may be returned within 30 days. Opened reagents cannot be returned once the seal is broken.</p></div>' +
+            '<div class="acc-a"><p>In-stock items go out within 1 business day and ship tracked in plain, tamper-evident packaging. Free shipping on orders over ' + money(FREE_SHIP) + ', otherwise a flat ' + money(SHIP_COST) + '. Unopened items may be returned within 30 days. Opened reagents cannot be returned once the seal is broken.</p></div>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -1011,7 +1011,7 @@ function initCheckout() {
           '<svg viewBox="0 0 24 24" width="34" height="34"><path d="M4 12.5l5 5L20 6.5" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
         '</div>' +
         '<h1>Order received.</h1>' +
-        '<p>A confirmation with your lot numbers is on its way. In-stock items dispatch within 1 business day, tracked.</p>' +
+        '<p>A confirmation with your lot numbers is on its way. In-stock items go out within 1 business day, tracked.</p>' +
         '<a class="btn btn-primary" href="shop.html">Back to catalog</a>' +
       '</div>';
     window.scrollTo({ top: 0 });

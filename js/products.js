@@ -1,10 +1,10 @@
-/* Nexus Research: catalog of laboratory reagents and consumables.
+/* Nexus Research: catalog of lab chemicals and supplies.
    RESEARCH USE ONLY. Not for human or veterinary use.
 
    Every entry carries the identity and handling data a lab actually
    needs to work with the material: CAS, formula, molecular weight,
    purity and the method used to determine it, form, and storage.
-   `lot` is the batch whose certificate of analysis is on file.
+   `lot` is the batch whose test report is on file.
 */
 const PRODUCTS = [
   {
@@ -19,12 +19,12 @@ const PRODUCTS = [
     size: "50 mg",
     purity: ">99%",
     method: "HPLC-UV, identity by LC-MS",
-    form: "Lyophilized powder",
-    storage: "Store at -20 °C, protected from light. Ships ambient as a lyophilized solid.",
-    solubility: "Soluble in water and aqueous buffers.",
+    form: "Freeze-dried powder",
+    storage: "Keep in a freezer at -20 °C, out of the light. Ships at room temperature as a dry powder.",
+    solubility: "Dissolves in water and water-based buffers.",
     lot: "NR-2601-A",
     tagline: "Copper-binding tripeptide used in extracellular matrix and fibroblast studies.",
-    description: "GHK-Cu is the copper(II) complex of the tripeptide glycyl-L-histidyl-L-lysine, used in in-vitro investigation of collagen synthesis, fibroblast activity, and metalloprotein chemistry. Supplied as a lyophilized solid with identity confirmed by LC-MS and purity determined by HPLC-UV.",
+    description: "GHK-Cu is the copper(II) complex of the tripeptide glycyl-L-histidyl-L-lysine, used in lab studies of collagen production, skin-cell activity, and how peptides bind metals. Ships as a freeze-dried powder. An outside lab confirmed the compound and measured its purity.",
     apps: ["Extracellular matrix studies", "Fibroblast culture models", "Metalloprotein chemistry"],
     price: 48.00,
     img: "nexus-vial"
@@ -41,12 +41,12 @@ const PRODUCTS = [
     size: "50 mg",
     purity: ">99%",
     method: "HPLC-UV, identity by LC-MS",
-    form: "Lyophilized powder",
-    storage: "Store at -20 °C, desiccated. Ships ambient as a lyophilized solid.",
-    solubility: "Freely soluble in water.",
+    form: "Freeze-dried powder",
+    storage: "Keep in a freezer at -20 °C, kept dry. Ships at room temperature as a dry powder.",
+    solubility: "Dissolves easily in water.",
     lot: "NR-2601-B",
     tagline: "The uncomplexed tripeptide, for use as a reference or copper-free control.",
-    description: "GHK is the free tripeptide corresponding to the copper complex GHK-Cu. It is commonly run as a copper-free control alongside GHK-Cu to separate peptide-driven effects from metal-driven effects in culture. Identity confirmed by LC-MS.",
+    description: "GHK is the free tripeptide corresponding to the copper complex GHK-Cu. It is commonly run as a copper-free control alongside GHK-Cu to separate peptide-driven effects from metal-driven effects in culture. An outside lab confirmed the compound.",
     apps: ["Control for GHK-Cu experiments", "Peptide reference standard", "Chelation studies"],
     price: 39.00,
     img: "nexus-vial"
@@ -64,7 +64,7 @@ const PRODUCTS = [
     purity: ">99%",
     method: "HPLC-UV, titration",
     form: "Crystalline powder",
-    storage: "Store at 2 to 8 °C, desiccated and protected from air. Oxidizes on exposure to moisture.",
+    storage: "Keep in a fridge at 2 to 8 °C, dry and sealed from air. It reacts with air on exposure to moisture.",
     solubility: "Soluble in water, approx. 100 mg/mL.",
     lot: "NR-2601-C",
     tagline: "Reference thiol antioxidant for redox and oxidative stress assays.",
@@ -86,7 +86,7 @@ const PRODUCTS = [
     purity: ">99%",
     method: "HPLC-UV",
     form: "Crystalline powder",
-    storage: "Store at 2 to 8 °C, desiccated.",
+    storage: "Keep in a fridge at 2 to 8 °C, kept dry.",
     solubility: "Soluble in water.",
     lot: "NR-2601-D",
     tagline: "The disulfide dimer, paired with GSH for redox ratio work.",
@@ -108,7 +108,7 @@ const PRODUCTS = [
     purity: ">99%",
     method: "HPLC-UV, titration",
     form: "Crystalline powder",
-    storage: "Store at room temperature, tightly sealed and desiccated.",
+    storage: "Keep at room temperature, tightly sealed and dry.",
     solubility: "Freely soluble in water, approx. 200 mg/mL.",
     lot: "NR-2601-E",
     tagline: "Thiol reagent and cysteine precursor for cell culture work.",
@@ -133,9 +133,9 @@ const PRODUCTS = [
     storage: "Store at room temperature. Do not freeze.",
     solubility: "Miscible, used as a diluent.",
     lot: "NR-2601-F",
-    tagline: "Multi-dose diluent for reconstituting lyophilized reagents.",
-    description: "Sterile water containing 0.9% benzyl alcohol as a bacteriostatic agent, allowing a sealed vial to be entered multiple times during a work session. Standard laboratory diluent for reconstituting lyophilized powders.",
-    apps: ["Reconstituting lyophilized reagents", "Multi-dose stock preparation", "General laboratory diluent"],
+    tagline: "Multi-dose liquid for mixing with freeze-dried powders.",
+    description: "Sterile water containing 0.9% benzyl alcohol as a bacteriostatic agent, allowing a sealed vial to be entered multiple times during a work session. The standard lab liquid for mixing freeze-dried powders back into solution.",
+    apps: ["Mixing freeze-dried powders", "Multi-dose stock preparation", "General laboratory diluent"],
     price: 12.00,
     img: "nexus-vial"
   },
@@ -156,8 +156,8 @@ const PRODUCTS = [
     solubility: null,
     lot: "NR-2601-G",
     tagline: "Type I borosilicate vials with tamper-evident aluminium seals.",
-    description: "Depyrogenated Type I borosilicate vials with butyl rubber stoppers and aluminium crimp seals. Suitable for storing reconstituted stocks and aliquoting lyophilized material under sterile technique.",
-    apps: ["Stock aliquoting", "Lyophilized storage", "Sterile sample handling"],
+    description: "Depyrogenated Type I borosilicate vials with butyl rubber stoppers and aluminium crimp seals. For storing mixed solutions and splitting dry powder into smaller portions under sterile technique.",
+    apps: ["Splitting into portions", "Dry powder storage", "Sterile sample handling"],
     price: 26.00,
     img: "nexus-vial"
   },
@@ -178,7 +178,7 @@ const PRODUCTS = [
     solubility: null,
     lot: "NR-2601-H",
     tagline: "Sterilizing-grade filtration for aqueous solutions.",
-    description: "Sterilizing-grade 0.22 µm polyethersulfone syringe filters with low protein binding and luer-lock fittings. Used to sterile-filter reconstituted aqueous stocks and buffers prior to use in culture.",
+    description: "Sterilizing-grade 0.22 µm polyethersulfone syringe filters with low protein binding and luer-lock fittings. Used to sterile-filter mixed water-based solutions and buffers before use in culture.",
     apps: ["Sterile filtration of stocks", "Buffer clarification", "Culture media preparation"],
     price: 34.00,
     img: "nexus-vial"

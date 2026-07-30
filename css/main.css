@@ -2605,43 +2605,11 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
 }
 .hero-tech.is-live .hero-grid-bg { opacity: 1; }
 
-/* the trace itself */
-.hero-chrom {
-  position: absolute; left: 0; right: 0; bottom: -2px; z-index: -1;
-  color: var(--mint); opacity: .55;
-  pointer-events: none;
-}
-.hero-chrom svg { width: 100%; height: clamp(120px, 20vw, 260px); display: block; }
-.hero-chrom path {
-  stroke-dasharray: 2260;
-  stroke-dashoffset: 2260;
-  animation: trace 3.4s cubic-bezier(.22,.7,.3,1) .35s forwards;
-  filter: drop-shadow(0 0 12px rgba(20,236,195,.55));
-}
-@keyframes trace { to { stroke-dashoffset: 0; } }
-
-/* Once it has drawn in, the trace keeps breathing like a live readout
-   instead of freezing into a static graphic. */
-.hero-chrom {
-  transform-origin: bottom center;
-  animation: chromBreathe 9s ease-in-out 3.8s infinite;
-  transition: opacity .45s ease;
-}
-@keyframes chromBreathe {
-  0%, 100% { opacity: .5;  transform: scaleY(1); }
-  50%      { opacity: .68; transform: scaleY(1.055); }
-}
-.hero-tech.is-live .hero-chrom { opacity: .72; }
-
 @media (prefers-reduced-motion: reduce) {
-  .hero-chrom path { animation: none; stroke-dashoffset: 0; }
-  .hero-chrom,
   .hero-aurora .blob { animation: none; }
   .hero-spot { display: none; }
 }
 
-/* a slim trace used as a section divider */
-/* (trace-rule divider removed: the catalog now runs straight into the band) */
 
 /* The footer carries a 96px top margin so a light section does not slam
    into it. When the page already ends on the dark band, that margin is
