@@ -231,10 +231,10 @@ function shellFooterHTML() {
       '<div class="footer-legal">' +
         '<span>&copy; 2026 Nexus Research. All rights reserved.</span>' +
         '<span class="footer-legal-links">' +
-          '<a href="index.html#faq">Terms</a>' +
-          '<a href="index.html#faq">Privacy</a>' +
+          '<a href="terms.html">Terms</a>' +
+          '<a href="privacy.html">Privacy</a>' +
           '<a href="shipping.html">Shipping policy</a>' +
-          '<a href="index.html#faq">RUO agreement</a>' +
+          '<a href="ruo-agreement.html">RUO agreement</a>' +
         '</span>' +
       '</div>' +
     '</div>' +
