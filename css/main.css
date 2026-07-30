@@ -1253,9 +1253,11 @@ main section > .container > h2,
 @media (max-width: 1000px) {
   .lineup-grid { grid-template-columns: repeat(2, 1fr); }
 }
+/* Stay two-up on phones. One card per row meant scrolling a full screen
+   per product; two lets you scan the catalog. */
 @media (max-width: 520px) {
-  .lineup-grid { grid-template-columns: 1fr; }
-  .lineup-grid .card-art { height: 240px; }
+  .lineup-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .lineup-grid .card-art { height: 132px; }
 }
 
 /* ============================================================
@@ -2611,10 +2613,39 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
 }
 
 
-/* The footer carries a 96px top margin so a light section does not slam
-   into it. When the page already ends on the dark band, that margin is
-   just a black gap, so drop it. */
-body:has(main > .band:last-child) .site-footer { margin-top: 0; }
+/* The footer used to carry a 96px top margin. Every section boundary on
+   this site is a hard edge, so that margin only ever read as a strip of
+   dead black between the last section and the footer. The footer's own
+   top padding is the breathing room. */
+.site-footer { margin-top: 0; }
+
+/* Pages whose content is a bare container (catalog, product, checkout)
+   were leaning on that margin for their bottom breathing room and would
+   otherwise butt into the footer. Give them their own. */
+main > .container:last-child { padding-bottom: clamp(56px, 6vw, 88px); }
+
+/* Two product cards per row on a phone: tighten the type so the name and
+   price still fit a half-width card. */
+@media (max-width: 520px) {
+  .lineup-grid .card-body { padding: 12px 12px 14px; }
+  /* Scales with the card so "BACTERIOSTATIC" fits on one line at 320px
+     instead of snapping mid-word. */
+  .lineup-grid .card-name {
+    font-size: clamp(11.5px, 3.4vw, 14px);
+    line-height: 1.22;
+    overflow-wrap: break-word;   /* break only when a word truly cannot fit */
+    hyphens: auto;
+  }
+  .lineup-grid .card-sub { font-size: 9.5px; letter-spacing: .08em; }
+  .lineup-grid .card-price strong { font-size: 15px; }
+  .lineup-grid .card-add { padding: 12px 8px; font-size: 10px; letter-spacing: .06em; }
+  .lineup-grid .card-meta { font-size: 9.5px; }
+  /* "CAS 89030-95-5" will not sit beside "SIZE 50 mg" in a 129px card, so
+     stack the spec pairs and let a long CAS wrap rather than overflow. */
+  .lineup-grid .card-specs { flex-direction: column; gap: 2px; }
+  .lineup-grid .card-specs span { font-size: 9.5px; gap: 4px; min-width: 0; flex-wrap: wrap; }
+  .lineup-grid .card-specs i { flex: 0 0 auto; }
+}
 
 
 /* ============================================================
