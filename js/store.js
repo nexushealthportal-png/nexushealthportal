@@ -185,35 +185,51 @@ function shellHeaderHTML() {
 function shellFooterHTML() {
   return '' +
   '<footer class="site-footer">' +
-    '<div class="footer-inner">' +
-      '<div class="footer-grid">' +
-        '<div class="footer-brand"><span class="footer-wordmark">NEXUS <em>Research</em></span>' +
-          '<p>Laboratory reagents and consumables, independently tested with a certificate of analysis on every lot.</p>' +
-          '<p class="footer-badges"><span>HPLC + LC-MS</span><span>Tamper-sealed</span></p></div>' +
-        '<div class="footer-col"><h4>Catalog</h4>' +
-          '<a href="shop.html">All products</a>' +
-          '<a href="shop.html?cat=peptides">Peptides</a>' +
-          '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
-          '<a href="shop.html?cat=supplies">Lab supplies</a></div>' +
-        '<div class="footer-col"><h4>Company</h4>' +
-          '<a href="index.html#quality">Quality &amp; testing</a>' +
-          '<a href="index.html#coa">Certificates</a>' +
-          '<a href="index.html#shipping">Shipping &amp; handling</a>' +
-          '<a href="index.html#faq">FAQ</a></div>' +
-        '<div class="footer-col"><h4>Support</h4>' +
-          '<a href="mailto:support@nexusresearch.co">support@nexusresearch.co</a>' +
-          '<a href="index.html#faq">Wholesale</a>' +
-          '<a href="index.html#faq">Returns</a></div>' +
+    '<div class="footer-card">' +
+      '<div class="footer-glow" aria-hidden="true"></div>' +
+      '<div class="footer-inner">' +
+        '<div class="footer-grid">' +
+          '<div class="footer-brand">' +
+            '<p class="footer-tag">Laboratory reagents and consumables, independently tested with a certificate of analysis on every lot.</p>' +
+            '<p class="footer-badges"><span>HPLC + LC-MS</span><span>Tamper-sealed</span></p>' +
+          '</div>' +
+          '<div class="footer-col"><h4>Catalog</h4>' +
+            '<a href="shop.html">All products</a>' +
+            '<a href="shop.html?cat=peptides">Peptides</a>' +
+            '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
+            '<a href="shop.html?cat=supplies">Lab supplies</a></div>' +
+          '<div class="footer-col"><h4>Company</h4>' +
+            '<a href="index.html#quality">Quality &amp; testing</a>' +
+            '<a href="index.html#coa">Certificates</a>' +
+            '<a href="index.html#shipping">Shipping &amp; handling</a>' +
+            '<a href="index.html#faq">FAQ</a></div>' +
+          '<div class="footer-col"><h4>Support</h4>' +
+            '<a href="mailto:support@nexusresearch.co">support@nexusresearch.co</a>' +
+            '<a href="index.html#faq">Wholesale</a>' +
+            '<a href="index.html#faq">Returns</a></div>' +
+        '</div>' +
+
+        '<div class="footer-fine">' +
+          '<p><strong>DISCLAIMER</strong> &mdash; All products sold by Nexus Research are intended for ' +
+          'laboratory research use only. They are not for human or animal consumption of any kind, and are ' +
+          'not drugs, foods, cosmetics, or dietary supplements. Nothing on this site constitutes medical advice ' +
+          'or a recommendation regarding the use of any compound, and no statement here has been evaluated by ' +
+          'the Food and Drug Administration. Purchasers confirm that they are qualified to handle research ' +
+          'chemicals and assume all responsibility for safe and lawful use.</p>' +
+        '</div>' +
+
+        '<div class="footer-legal">' +
+          '<span>&copy; 2026 Nexus Research. All rights reserved.</span>' +
+          '<span class="footer-legal-links">' +
+            '<a href="index.html#faq">Terms</a>' +
+            '<a href="index.html#faq">Privacy</a>' +
+            '<a href="index.html#shipping">Shipping policy</a>' +
+            '<a href="index.html#faq">RUO agreement</a>' +
+          '</span>' +
+        '</div>' +
       '</div>' +
-      '<div class="footer-fine">' +
-        '<p><strong>DISCLAIMER</strong> &mdash; All products sold by Nexus Research are intended for ' +
-        'laboratory research use only. They are not for human or animal consumption of any kind, and are ' +
-        'not drugs, foods, cosmetics, or dietary supplements. Nothing on this site constitutes medical advice ' +
-        'or a recommendation regarding the use of any compound, and no statement here has been evaluated by ' +
-        'the Food and Drug Administration. Purchasers confirm that they are qualified to handle research ' +
-        'chemicals and assume all responsibility for safe and lawful use.</p>' +
-        '<p>&copy; 2026 Nexus Research. All rights reserved.</p>' +
-      '</div>' +
+
+      '<div class="footer-mega" aria-hidden="true">NEXUS <em>RESEARCH</em></div>' +
     '</div>' +
   '</footer>';
 }
