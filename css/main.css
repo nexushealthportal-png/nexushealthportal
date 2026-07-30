@@ -2451,3 +2451,175 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
   .footer-legal { flex-direction: column; align-items: flex-start; gap: 14px; }
   .site-footer .footer-grid { gap: 26px 18px; }
 }
+
+/* ============================================================
+   PALETTE EXPANSION
+   The site was black end to end. Adding a paper surface and a
+   violet so sections can alternate light and dark.
+   ============================================================ */
+:root {
+  --paper:      #F1F2F6;
+  --paper-2:    #E4E7EF;
+  --paper-line: rgba(10,11,16,.14);
+  --paper-ink:  #0A0B10;
+  --paper-soft: rgba(10,11,16,.62);
+  --violet:     #6D28FF;
+  --violet-dp:  #3A0BB8;
+}
+
+/* ------------------------------------------------------------
+   LIGHT SECTIONS
+   Scoped re-theme so shared components invert cleanly.
+   ------------------------------------------------------------ */
+.sec-light {
+  background: var(--paper);
+  color: var(--paper-ink);
+}
+.sec-light .sec-head,
+.sec-light h1, .sec-light h2, .sec-light h3, .sec-light h4 { color: var(--paper-ink); }
+.sec-light .sec-head-wrap p,
+.sec-light p { color: var(--paper-soft); }
+.sec-light .sec-eyebrow { color: var(--violet); }
+
+/* product cards on paper */
+.sec-light .product-card {
+  background: #fff;
+  border: 1px solid var(--paper-line);
+  box-shadow: 0 1px 2px rgba(10,11,16,.04);
+}
+.sec-light .lineup-grid { background: transparent; }
+.sec-light .card-art { background: var(--paper-2); }
+.sec-light .card-name { color: var(--paper-ink); }
+.sec-light .card-sub { color: var(--violet); }
+.sec-light .card-specs span { color: var(--paper-soft); }
+.sec-light .card-specs i { color: rgba(10,11,16,.4); }
+.sec-light .card-price strong { color: var(--paper-ink); }
+.sec-light .card-add {
+  background: var(--paper-ink); border-color: var(--paper-ink); color: #fff;
+}
+.sec-light .card-add:hover { background: var(--blue); border-color: var(--blue); }
+.sec-light .badge { background: var(--paper-ink); color: #fff; }
+
+/* buttons on paper */
+.sec-light .btn-ghost { border-color: var(--paper-line); color: var(--paper-ink); }
+.sec-light .btn-ghost:hover { background: var(--paper-ink); color: #fff; border-color: var(--paper-ink); }
+
+/* accordions on paper */
+.sec-light .acc-item { border-color: var(--paper-line); }
+.sec-light .acc-q { color: var(--paper-ink); }
+.sec-light .acc-a p, .sec-light .acc-a li { color: var(--paper-soft); }
+.sec-light .acc-icon { color: var(--violet); }
+
+/* stats on paper */
+.sec-light .stat strong { color: var(--paper-ink); }
+.sec-light .stat span { color: var(--violet); }
+
+/* form fields on paper */
+.sec-light input[type="text"], .sec-light input[type="email"], .sec-light input[type="search"], .sec-light select {
+  background: #fff; border-color: var(--paper-line); color: var(--paper-ink);
+}
+.sec-light input::placeholder { color: rgba(10,11,16,.4); }
+.sec-light .chip { background: #fff; border-color: var(--paper-line); color: var(--paper-ink); }
+.sec-light .chip.active { background: var(--paper-ink); border-color: var(--paper-ink); color: #fff; }
+.sec-light .text-btn { color: var(--violet); }
+.sec-light .empty-state { border-color: var(--paper-line); }
+
+/* ============================================================
+   AURORA HERO + CHROMATOGRAM MOTIF
+   The chromatogram is the brand's signature: it is literally the
+   purity trace the whole business is built on.
+   ============================================================ */
+.hero-tech {
+  position: relative;
+  background: #05060C;
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero-aurora {
+  position: absolute; inset: -20% -10% auto -10%; height: 130%; z-index: -2;
+  background:
+    radial-gradient(46% 52% at 18% 8%,  rgba(109,40,255,.60) 0%, transparent 62%),
+    radial-gradient(44% 50% at 78% 22%, rgba(26,4,255,.62)  0%, transparent 64%),
+    radial-gradient(50% 46% at 52% 88%, rgba(20,236,195,.20) 0%, transparent 62%),
+    linear-gradient(160deg, #0A0620 0%, #05060C 58%, #04050A 100%);
+  filter: blur(6px);
+}
+.hero-aurora::after {                      /* fine grain so the gradient isn't flat */
+  content: ""; position: absolute; inset: 0; opacity: .35;
+  background-image: radial-gradient(rgba(255,255,255,.16) .5px, transparent .5px);
+  background-size: 3px 3px;
+}
+.hero-tech .hero-grid-bg {
+  z-index: -1;
+  mask-image: radial-gradient(ellipse 74% 60% at 26% 42%, #000 22%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 74% 60% at 26% 42%, #000 22%, transparent 78%);
+}
+
+/* the trace itself */
+.hero-chrom {
+  position: absolute; left: 0; right: 0; bottom: -2px; z-index: -1;
+  color: var(--mint); opacity: .55;
+  pointer-events: none;
+}
+.hero-chrom svg { width: 100%; height: clamp(120px, 20vw, 260px); display: block; }
+.hero-chrom path {
+  stroke-dasharray: 2260;
+  stroke-dashoffset: 2260;
+  animation: trace 3.4s cubic-bezier(.22,.7,.3,1) .35s forwards;
+  filter: drop-shadow(0 0 12px rgba(20,236,195,.55));
+}
+@keyframes trace { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-chrom path { animation: none; stroke-dashoffset: 0; }
+}
+
+/* a slim trace used as a section divider */
+.trace-rule {
+  height: 64px; color: var(--blue); opacity: .30;
+  overflow: hidden; pointer-events: none;
+}
+.trace-rule svg { width: 100%; height: 64px; display: block; }
+
+
+/* ============================================================
+   BAND: violet -> blue, brighter than the old near-black
+   ============================================================ */
+.band { background: #0B0524; }
+.band-glow {
+  background:
+    radial-gradient(105% 130% at 24% 0%,  rgba(109,40,255,.92) 0%, rgba(109,40,255,.34) 40%, transparent 70%),
+    radial-gradient(95% 120% at 82% 10%,  rgba(26,4,255,.80)  0%, transparent 62%),
+    radial-gradient(70% 80% at 62% 100%,  rgba(20,236,195,.24) 0%, transparent 60%),
+    linear-gradient(165deg, #2A0B8C 0%, #12064A 52%, #0B0524 100%);
+}
+.band-glow::after {
+  background:
+    linear-gradient(104deg, transparent 42%, rgba(190,215,255,.34) 50%, transparent 58%),
+    radial-gradient(rgba(255,255,255,.14) .5px, transparent .5px);
+  background-size: auto, 3px 3px;
+  filter: none;
+}
+.band-inner h2 { color: #fff; }
+.band-eyebrow { color: var(--mint); }
+
+/* ============================================================
+   LIGHT-SECTION SPACING
+   Light bands need more internal room than dark ones so the
+   colour block reads as deliberate rather than cramped.
+   ============================================================ */
+.lineup-lux.sec-light, .faq-section.sec-light {
+  padding-top: clamp(58px, 6.4vw, 92px);
+  padding-bottom: clamp(58px, 6.4vw, 92px);
+}
+.stats-band.sec-light { padding: clamp(34px, 3.6vw, 46px) 0; border: 0; }
+
+/* the catalog grid gets breathing room on paper */
+.sec-light .lineup-grid { gap: 18px; }
+.sec-light .card-add { border-radius: 6px !important; }
+
+
+/* .faq-head sets an explicit colour later in the sheet, so it needs an
+   equally specific override inside a light section. */
+.sec-light .faq-head,
+.sec-light .sec-head,
+.sec-light .reviews-head { color: var(--paper-ink); }
