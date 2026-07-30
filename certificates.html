@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificates | Nexus Research</title>
+  <meta name="description" content="Look up the certificate of analysis for any Nexus Research lot by lot number, product name, or CAS.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;900&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css?v=1784716900">
+</head>
+<body data-page="doc">
+
+  <main id="main" tabindex="-1">
+    <section class="doc-hero dotted dotted--mint dotted--top">
+      <div class="container doc-hero-grid">
+        <div class="doc-hero-copy">
+        <span class="doc-eyebrow">Certificates of analysis</span>
+        <h1>Every lot is<br>traceable.</h1>
+        <p class="doc-lead">Each batch carries a unique lot number printed on the vial. Search below to confirm which certificate covers your material, then request the signed report.</p>
+      </div>
+        <aside class="doc-hero-panel">
+          <span class="dhp-label">On every certificate</span>
+          <div class="dhp-list"><div class="dhp-row"><span class="dhp-k">Compound</span><span class="dhp-v">Name and lot</span></div><div class="dhp-row"><span class="dhp-k">Purity</span><span class="dhp-v">HPLC figure</span></div><div class="dhp-row"><span class="dhp-k">Identity</span><span class="dhp-v">LC-MS result</span></div><div class="dhp-row"><span class="dhp-k">Method</span><span class="dhp-v">Named on report</span></div><div class="dhp-row"><span class="dhp-k">Date</span><span class="dhp-v">Of analysis</span></div><div class="dhp-row"><span class="dhp-k">Signed copy</span><span class="dhp-v">On request</span></div></div>
+        </aside>
+      </div>
+    </section>
+    <section class="band" id="coa">
+      <div class="band-glow" aria-hidden="true"></div>
+      <div class="container band-inner">
+        <span class="band-eyebrow">Certificate lookup</span>
+        <h2>Find a lot certificate</h2>
+        <p>Search by lot number, product name, or CAS number.</p>
+        <form class="coa-form" id="coaForm" novalidate>
+          <input type="text" id="coaInput" placeholder="e.g. NR-2601-A, GHK-Cu, or 89030-95-5" aria-label="Lot number, product name, or CAS">
+          <button class="btn btn-primary" type="submit">Look up</button>
+        </form>
+        <div id="coaResult" aria-live="polite"></div>
+      </div>
+    </section>
+    <section class="doc-sec sec-light dotted dotted--ink dotted--fade">
+      <div class="container">
+        <span class="doc-eyebrow">What is on it</span>
+        <h2 class="doc-h2">Inside a certificate</h2>
+        <div class="doc-grid"><div class="doc-card"><h3>Compound and lot number</h3><p>The exact identifier printed on your vial, so the paperwork and the material cannot be confused.</p></div><div class="doc-card"><h3>HPLC purity</h3><p>The measured purity figure against a reference standard, with the analytical method stated.</p></div><div class="doc-card"><h3>LC-MS identity</h3><p>Confirmation that the molecular identity matches the compound named on the label.</p></div><div class="doc-card"><h3>Method and date</h3><p>Which analysis was run, and when, so you can judge how current the figure is.</p></div></div>
+      </div>
+    </section>
+    <section class="doc-sec sec-light dotted dotted--violet dotted--wide">
+      <div class="container">
+        <span class="doc-eyebrow">Requesting one</span>
+        <h2 class="doc-h2">Three steps</h2>
+        <div class="doc-steps"><div class="doc-step"><span class="doc-num">01</span><h3>Find your lot number</h3><p>It is printed on the vial label and listed on your order confirmation.</p></div><div class="doc-step"><span class="doc-num">02</span><h3>Search above</h3><p>Confirm which product and certificate the lot belongs to.</p></div><div class="doc-step"><span class="doc-num">03</span><h3>Email support</h3><p>Send the lot number to support@nexusresearch.co and we return the signed certificate for that exact batch.</p></div></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/products.js?v=1784716900"></script>
+  <script src="js/store.js?v=1784716900"></script>
+</body>
+</html>

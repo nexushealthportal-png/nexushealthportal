@@ -2718,3 +2718,187 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
   mask-image: linear-gradient(0deg, #000 0%, transparent 72%);
   -webkit-mask-image: linear-gradient(0deg, #000 0%, transparent 72%);
 }
+
+/* ============================================================
+   BOUNDARY BALANCE
+   Audit found lopsided joins: catalog -> cards was 62px above the
+   fold and 0px below, so cards slammed into the colour change.
+   ============================================================ */
+.cards-sec { padding-top: var(--sec-y) !important; padding-bottom: var(--sec-y); }
+.lineup-lux.sec-light { padding-bottom: var(--sec-y-band); }
+.band { padding: clamp(56px, 6vw, 84px) 0; }
+.faq-section.sec-light { padding-top: var(--sec-y-band); padding-bottom: var(--sec-y-band); }
+
+/* ticker now sits at the top, directly under the header */
+.ticker { border-top: 0; border-bottom: 1px solid rgba(255,255,255,.14); }
+
+/* ============================================================
+   INFORMATIONAL PAGES
+   ============================================================ */
+.doc-hero {
+  padding: clamp(56px, 7vw, 104px) 0 clamp(44px, 5vw, 72px);
+  background: #05060C;
+  position: relative;
+}
+.doc-eyebrow {
+  display: block;
+  font-family: "Space Mono", monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--mint); margin-bottom: 18px;
+}
+.doc-hero h1 {
+  font-weight: 900;
+  font-size: clamp(34px, 6vw, 76px);
+  line-height: .97; letter-spacing: -.03em;
+  text-transform: uppercase; margin-bottom: 22px;
+}
+.doc-lead {
+  font-size: clamp(15px, 1.6vw, 19px);
+  line-height: 1.6; color: var(--ink-soft); max-width: 660px;
+}
+
+.doc-stats { padding: clamp(30px, 3.4vw, 44px) 0; }
+.doc-stat-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 20px; }
+.doc-stat strong {
+  display: block; font-weight: 900;
+  font-size: clamp(24px, 3vw, 40px); letter-spacing: -.02em;
+  color: var(--paper-ink); margin-bottom: 6px;
+}
+.doc-stat span {
+  font-family: "Space Mono", monospace;
+  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--violet);
+}
+
+.doc-sec { padding: clamp(52px, 6vw, 88px) 0; position: relative; }
+.doc-h2 {
+  font-weight: 900; font-size: clamp(24px, 3.4vw, 42px);
+  letter-spacing: -.025em; text-transform: uppercase;
+  line-height: 1.02; margin-bottom: clamp(28px, 3.4vw, 46px);
+}
+
+.doc-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+.doc-card {
+  border: 1px solid var(--line-soft); border-radius: 12px;
+  padding: 26px 24px; background: #0B0B0B;
+}
+.doc-card h3 {
+  font-weight: 900; font-size: 17px; letter-spacing: -.01em;
+  text-transform: uppercase; margin-bottom: 10px;
+}
+.doc-card p { font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+.sec-light .doc-card { background: #fff; border-color: var(--paper-line); }
+.sec-light .doc-card h3 { color: var(--paper-ink); }
+.sec-light .doc-card p { color: var(--paper-soft); }
+
+.doc-steps { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+.doc-step {
+  border-top: 2px solid var(--violet);
+  padding-top: 18px;
+}
+.doc-num {
+  display: block; font-family: "Space Mono", monospace;
+  font-weight: 700; font-size: 11px; letter-spacing: .16em;
+  color: var(--violet); margin-bottom: 12px;
+}
+.doc-step h3 {
+  font-weight: 900; font-size: 16px; letter-spacing: -.01em;
+  text-transform: uppercase; margin-bottom: 9px;
+}
+.doc-step p { font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); }
+.sec-light .doc-step h3 { color: var(--paper-ink); }
+.sec-light .doc-step p { color: var(--paper-soft); }
+
+.band-inner .btn { margin-top: 6px; }
+
+@media (max-width: 1000px) {
+  .doc-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .doc-steps { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 620px) {
+  .doc-grid, .doc-steps { grid-template-columns: 1fr; }
+  .doc-stat-row { grid-template-columns: 1fr; gap: 22px; text-align: center; }
+}
+
+/* Doc headings inside light sections need the dark ink, and the mint
+   eyebrow is unreadable on paper. */
+.sec-light .doc-h2,
+.sec-light .doc-hero h1 { color: var(--paper-ink); }
+.sec-light .doc-eyebrow { color: var(--violet); }
+.sec-light .doc-lead { color: var(--paper-soft); }
+
+/* --- Doc hero: the right half was dead space. A per-page spec panel fills
+   it with real information instead of stretched padding. --- */
+.doc-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+}
+.doc-hero-copy .doc-lead { max-width: 560px; }
+
+.doc-hero-panel {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.028);
+  padding: clamp(20px, 2.2vw, 28px);
+  position: relative;
+}
+/* corner tick, borrowed from instrument faceplates */
+.doc-hero-panel::before {
+  content: ""; position: absolute; top: -1px; left: -1px;
+  width: 34px; height: 3px; background: var(--mint);
+}
+.dhp-label {
+  display: block;
+  font-family: "Space Mono", monospace;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--mint);
+  margin-bottom: 16px;
+}
+.dhp-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 16px; padding: 11px 0;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.16);
+}
+.dhp-row:first-child { padding-top: 0; }
+.dhp-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.dhp-k {
+  font-family: "Space Mono", monospace;
+  font-size: 10.5px; letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--ink-soft); flex: 0 0 auto;
+}
+.dhp-v {
+  font-size: 13px; font-weight: 600;
+  color: #fff; text-align: right;
+}
+@media (max-width: 900px) {
+  .doc-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  .doc-hero-panel { max-width: 520px; }
+}
+
+/* Four cards in a three-column grid orphans one and leaves a hole in the
+   row. Match the column count to the item count so every row is complete.
+   Scoped above the stacking breakpoints so mobile still collapses. */
+@media (min-width: 1001px) {
+  .doc-grid:has(> .doc-card:nth-child(4):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .doc-steps:has(> .doc-step:nth-child(3):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Buttons are nowrap with 34px side padding, which is wider than the
+   content box on a 320px phone. Let long labels wrap and tighten the
+   padding so no button can push its container sideways. */
+.btn { max-width: 100%; }
+@media (max-width: 460px) {
+  .btn {
+    white-space: normal;
+    text-align: center;
+    padding-left: 22px;
+    padding-right: 22px;
+    letter-spacing: 0.06em;
+    line-height: 1.35;
+  }
+}

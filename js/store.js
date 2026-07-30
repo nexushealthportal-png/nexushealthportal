@@ -152,9 +152,10 @@ function shellHeaderHTML() {
         '<a href="shop.html?cat=peptides">Peptides</a>' +
         '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
         '<a href="shop.html?cat=supplies">Lab supplies</a>' +
+        '<a href="quality.html">Quality</a>' +
       '</nav>' +
       '<div class="nav-right">' +
-        '<a class="nav-about" href="index.html#quality">Quality</a>' +
+        '<a class="nav-about" href="about.html">About</a>' +
         '<button class="cart-btn" id="cartBtn" aria-label="Open cart">' +
           '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M6 8V7a6 6 0 0 1 12 0v1h2.5l-1.2 12.2A2 2 0 0 1 17.3 22H6.7a2 2 0 0 1-2-1.8L3.5 8H6zm2 0h8V7a4 4 0 0 0-8 0v1z" fill="currentColor"/></svg>' +
           '<span>Cart</span><span class="cart-count" id="cartCount">0</span>' +
@@ -166,7 +167,11 @@ function shellHeaderHTML() {
       '<a href="shop.html?cat=peptides">Peptides</a>' +
       '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
       '<a href="shop.html?cat=supplies">Lab supplies</a>' +
-      '<a href="index.html#quality">Quality</a>' +
+      '<a href="quality.html">Quality &amp; testing</a>' +
+      '<a href="certificates.html">Certificates</a>' +
+      '<a href="shipping.html">Shipping</a>' +
+      '<a href="wholesale.html">Wholesale</a>' +
+      '<a href="about.html">About</a>' +
     '</div>' +
   '</header>' +
   '<div class="drawer-overlay" id="drawerOverlay"></div>' +
@@ -198,14 +203,17 @@ function shellFooterHTML() {
           '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
           '<a href="shop.html?cat=supplies">Lab supplies</a></div>' +
         '<div class="footer-col"><h4>Company</h4>' +
-          '<a href="index.html#quality">Quality &amp; testing</a>' +
-          '<a href="index.html#coa">Certificates</a>' +
-          '<a href="index.html#shipping">Shipping &amp; handling</a>' +
-          '<a href="index.html#faq">FAQ</a></div>' +
+          '<a href="about.html">About Nexus</a>' +
+          '<a href="quality.html">Quality &amp; testing</a>' +
+          '<a href="certificates.html">Certificates</a>' +
+          '<a href="shipping.html">Shipping &amp; handling</a></div>' +
         '<div class="footer-col"><h4>Support</h4>' +
-          '<a href="mailto:support@nexusresearch.co">support@nexusresearch.co</a>' +
-          '<a href="index.html#faq">Wholesale</a>' +
-          '<a href="index.html#faq">Returns</a></div>' +
+          // <wbr> after the @ so a narrow column breaks the address at a
+          // readable point instead of mid-word ("nexusresearc / h.co")
+          '<a href="mailto:support@nexusresearch.co">support@<wbr>nexusresearch.co</a>' +
+          '<a href="wholesale.html">Wholesale</a>' +
+          '<a href="index.html#faq">FAQ</a>' +
+          '<a href="shipping.html">Returns</a></div>' +
         '<div class="footer-col"><h4>Get in touch</h4>' +
           '<p class="footer-note">Laboratory reagents and consumables, independently tested with a certificate of analysis on every lot.</p>' +
           '<p class="footer-badges"><span>HPLC + LC-MS</span><span>Tamper-sealed</span></p></div>' +
@@ -225,7 +233,7 @@ function shellFooterHTML() {
         '<span class="footer-legal-links">' +
           '<a href="index.html#faq">Terms</a>' +
           '<a href="index.html#faq">Privacy</a>' +
-          '<a href="index.html#shipping">Shipping policy</a>' +
+          '<a href="shipping.html">Shipping policy</a>' +
           '<a href="index.html#faq">RUO agreement</a>' +
         '</span>' +
       '</div>' +
@@ -323,13 +331,60 @@ function initMegaFit() {
     mark.style.fontSize = "100px";
     var natural = mark.getBoundingClientRect().width;
     if (!natural) return;
-    var avail = wrap.clientWidth;
-    mark.style.fontSize = Math.max(20, Math.floor(avail / natural * 100)) + "px";
+    // clientWidth INCLUDES the wrapper's padding, so using it directly let the
+    // mark run past the padding and get chopped by overflow:hidden. The real
+    // room is the content box.
+    var cs = getComputedStyle(wrap);
+    var avail = wrap.clientWidth -
+                parseFloat(cs.paddingLeft || 0) -
+                parseFloat(cs.paddingRight || 0);
+    if (!(avail > 0)) return;
+    // 0.995 leaves a sub-pixel guard so rounding can never clip the last glyph
+    mark.style.fontSize = Math.max(20, Math.floor(avail / natural * 99.5)) + "px";
+    // hard backstop: if anything still overflows, step down until it fits
+    var guard = 0;
+    while (mark.getBoundingClientRect().width > avail && guard < 40) {
+      mark.style.fontSize = (parseFloat(mark.style.fontSize) - 1) + "px";
+      guard++;
+    }
   }
 
   fit();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-  window.addEventListener("resize", fit);
+  setTimeout(fit, 600);                       // late webfont swap
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(wrap);
+  else window.addEventListener("resize", fit);
+}
+
+
+/* COA lookup. Lives on its own so the homepage band and the certificates
+   page can both host it. No-ops when the form is not present. */
+function initCoa() {
+  // COA lookup: resolves a lot number to its product record
+  var coaForm = document.getElementById("coaForm");
+  if (coaForm) {
+    coaForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var q = document.getElementById("coaInput").value.trim().toLowerCase();
+      var out = document.getElementById("coaResult");
+      if (!q) { out.innerHTML = ""; return; }
+      var hit = PRODUCTS.find(function (p) {
+        return (p.lot && p.lot.toLowerCase() === q) ||
+               p.name.toLowerCase().indexOf(q) !== -1 ||
+               (p.cas && p.cas === q);
+      });
+      if (hit) {
+        out.innerHTML = '<div class="coa-hit">' +
+          '<span class="coa-lot">' + esc(hit.lot) + '</span>' +
+          '<span class="coa-name">' + esc(hit.name) + ' &middot; ' + esc(hit.purity) + ' by ' + esc(hit.method) + '</span>' +
+          '<a class="text-btn" href="product.html?id=' + esc(hit.id) + '">View product &rarr;</a>' +
+          '<p class="coa-note">Email support with this lot number and we will send the signed certificate for it.</p>' +
+        '</div>';
+      } else {
+        out.innerHTML = '<p class="coa-miss">No lot matching that reference. Search by lot number (for example NR-2601-A), product name, or CAS.</p>';
+      }
+    });
+  }
 }
 
 function initShell() {
@@ -352,6 +407,7 @@ function initShell() {
 
   renderCartUI();
   initMegaFit();
+  initCoa();
 }
 
 /* ============================================================
@@ -529,32 +585,6 @@ function initHome() {
       var open = testDetail.classList.toggle("open");
       testToggle.textContent = open ? "Hide method detail" : "See our testing method";
       testToggle.setAttribute("aria-expanded", open ? "true" : "false");
-    });
-  }
-
-  // COA lookup: resolves a lot number to its product record
-  var coaForm = document.getElementById("coaForm");
-  if (coaForm) {
-    coaForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var q = document.getElementById("coaInput").value.trim().toLowerCase();
-      var out = document.getElementById("coaResult");
-      if (!q) { out.innerHTML = ""; return; }
-      var hit = PRODUCTS.find(function (p) {
-        return (p.lot && p.lot.toLowerCase() === q) ||
-               p.name.toLowerCase().indexOf(q) !== -1 ||
-               (p.cas && p.cas === q);
-      });
-      if (hit) {
-        out.innerHTML = '<div class="coa-hit">' +
-          '<span class="coa-lot">' + esc(hit.lot) + '</span>' +
-          '<span class="coa-name">' + esc(hit.name) + ' &middot; ' + esc(hit.purity) + ' by ' + esc(hit.method) + '</span>' +
-          '<a class="text-btn" href="product.html?id=' + esc(hit.id) + '">View product &rarr;</a>' +
-          '<p class="coa-note">Email support with this lot number and we will send the signed certificate for it.</p>' +
-        '</div>';
-      } else {
-        out.innerHTML = '<p class="coa-miss">No lot matching that reference. Search by lot number (for example NR-2601-A), product name, or CAS.</p>';
-      }
     });
   }
 
