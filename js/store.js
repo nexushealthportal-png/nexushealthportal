@@ -210,7 +210,7 @@ function shellFooterHTML() {
         '<div class="footer-col"><h4>Support</h4>' +
           // <wbr> after the @ so a narrow column breaks the address at a
           // readable point instead of mid-word ("nexusresearc / h.co")
-          '<a href="mailto:support@nexusresearch.co">support@<wbr>nexusresearch.co</a>' +
+          '<a href="mailto:support@nexushealthportal.com">support@<wbr>nexushealthportal.com</a>' +
           '<a href="wholesale.html">Wholesale</a>' +
           '<a href="index.html#faq">FAQ</a>' +
           '<a href="shipping.html">Returns</a></div>' +
