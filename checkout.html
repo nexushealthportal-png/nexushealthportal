@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout | Nexus Health</title>
-  <meta name="description" content="Checkout at Nexus Health.">
+  <title>Checkout | Nexus Research</title>
+  <meta name="description" content="Checkout at Nexus Research.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;900&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/main.css?v=1784561500">
+  <link rel="stylesheet" href="css/main.css?v=1784570000">
 </head>
 <body data-page="checkout">
 
@@ -23,13 +23,13 @@
               <div class="form-row single">
                 <div class="field">
                   <label for="coEmail">Email</label>
-                  <input id="coEmail" type="email" required autocomplete="email" placeholder="you@example.com">
+                  <input id="coEmail" type="email" required autocomplete="email" placeholder="you@institution.edu">
                 </div>
               </div>
             </div>
 
             <div class="form-section">
-              <h2>Shipping address</h2>
+              <h2>Receiving facility</h2>
               <div class="form-row">
                 <div class="field">
                   <label for="coFirst">First name</label>
@@ -42,7 +42,13 @@
               </div>
               <div class="form-row single">
                 <div class="field">
-                  <label for="coAddress">Address</label>
+                  <label for="coOrg">Institution or company</label>
+                  <input id="coOrg" type="text" required autocomplete="organization">
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="field">
+                  <label for="coAddress">Delivery address</label>
                   <input id="coAddress" type="text" required autocomplete="street-address">
                 </div>
               </div>
@@ -66,6 +72,20 @@
                   <input id="coPhone" type="tel" autocomplete="tel">
                 </div>
               </div>
+            </div>
+
+            <div class="form-section">
+              <h2>Research use declaration</h2>
+              <label class="ruo-ack" for="coRuo">
+                <input type="checkbox" id="coRuo" required>
+                <span class="ruo-ack-box" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="14" height="14"><path d="M4 12.5l5 5L20 6.5" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="ruo-ack-body">
+                  <span class="ruo-ack-title">I confirm this order is for laboratory research use only</span>
+                  <span class="ruo-ack-desc">I am at least 21 years old and qualified to handle research chemicals. I understand these materials are not drugs, foods, cosmetics, or supplements, and I will not use or supply them for human or veterinary consumption. I accept the Research Use Only Agreement and Terms.</span>
+                </span>
+              </label>
             </div>
 
             <div class="form-section">
@@ -100,7 +120,7 @@
     </div>
   </main>
 
-  <script src="js/products.js?v=1784561500"></script>
-  <script src="js/store.js?v=1784561500"></script>
+  <script src="js/products.js?v=1784570000"></script>
+  <script src="js/store.js?v=1784570000"></script>
 </body>
 </html>

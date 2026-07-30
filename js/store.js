@@ -1,6 +1,11 @@
-/* Nexus Health: store.js
-   Shared shell (header, footer, cart drawer), cart logic, product photography,
+/* Nexus Research: store.js
+   Shared shell (header, footer, cart drawer), RUO access gate, cart logic,
    and per-page renderers. Pages declare themselves via <body data-page="...">.
+
+   RESEARCH USE ONLY storefront. Deliberately contains no consumer-conversion
+   machinery: no subscriptions, no urgency timers, no volume-discount ladders,
+   no testimonials, no outcome claims. Product pages carry identity and
+   handling data only.
 */
 
 /* ============================================================
@@ -17,55 +22,61 @@ function money(n) {
   return "$" + (Number.isInteger(n) ? String(n) : n.toFixed(2));
 }
 
-function fmtCount(n) {
-  return n.toLocaleString("en-US");
-}
-
 function qs(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
-/* ============================================================
-   Product photography
-   Real photos live in img/<name>.webp. This renders an <img>
-   sized to fill its tile via CSS (object-fit: cover).
-   ============================================================ */
-
 function productImg(p, eager) {
-  var altText = esc(p.name) + ", " + esc(p.subtitle);
-  return '<img class="tile-img" src="img/' + esc(p.img) + '.webp" alt="' + altText + '"' +
+  return '<img class="tile-img" src="img/' + esc(p.img) + '.webp" alt="' + esc(p.name) + '"' +
     (eager ? "" : ' loading="lazy"') + '>';
 }
 
-/* Star rating row */
-function starsSVG(rating) {
-  var star = '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path fill="#14ECC3" d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.8z"/></svg>';
-  return '<span class="stars" aria-label="Rated ' + rating + ' out of 5">' + star.repeat(5) + "</span>";
+/* ============================================================
+   RUO access gate
+   Confirms age and acceptance of the research-use-only terms before
+   the catalog is reachable. Choice is remembered per browser.
+   ============================================================ */
+
+var GATE_KEY = "nr_ruo_ack";
+
+function initGate() {
+  if (localStorage.getItem(GATE_KEY) === "1") return;
+
+  var gate = document.createElement("div");
+  gate.className = "ruo-gate";
+  gate.innerHTML =
+    '<div class="ruo-panel" role="dialog" aria-modal="true" aria-labelledby="ruoTitle">' +
+      '<span class="ruo-kicker">Research use only</span>' +
+      '<h2 id="ruoTitle">You must be 21 or older to enter.</h2>' +
+      '<p>Nexus Research supplies laboratory reagents and consumables strictly for ' +
+      '<strong>in-vitro research use</strong>. Our products are not drugs, foods, cosmetics, ' +
+      'or supplements, and are <strong>not for human or veterinary use</strong>.</p>' +
+      '<p>By entering you confirm that you are at least 21 years old, that you are ' +
+      'qualified to handle research chemicals, and that you accept our Research Use ' +
+      'Only Agreement and Terms.</p>' +
+      '<div class="ruo-actions">' +
+        '<button class="btn btn-primary" id="ruoEnter">I am 21 or older, and I accept</button>' +
+        '<a class="btn btn-ghost" id="ruoExit" href="https://www.google.com">Exit</a>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(gate);
+  document.body.classList.add("gate-lock");
+
+  document.getElementById("ruoEnter").addEventListener("click", function () {
+    localStorage.setItem(GATE_KEY, "1");
+    gate.remove();
+    document.body.classList.remove("gate-lock");
+  });
 }
 
 /* ============================================================
-   Cart (localStorage "vital_cart")
-   Items: { id, variant: "one"|"sub", qty }
+   Cart (localStorage "nr_cart")
+   Items: { id, qty }. Single price per SKU, no variants.
    ============================================================ */
 
-var CART_KEY = "vital_cart";
-var FREE_SHIP = 75;
-var SHIP_COST = 6.95;
-
-/* Nexus Membership: flat monthly fee that unlocks a members-only discount
-   on every order. Pre-selected at checkout, toggleable, cancel anytime. */
-var MEMBER_KEY = "vital_member";
-var MEMBER_FEE = 50;
-var MEMBER_RATE = 0.20;
-
-function isMember() {
-  var v = localStorage.getItem(MEMBER_KEY);
-  return v === null ? true : v === "1"; // default: enrolled (box pre-checked)
-}
-
-function setMember(on) {
-  localStorage.setItem(MEMBER_KEY, on ? "1" : "0");
-}
+var CART_KEY = "nr_cart";
+var FREE_SHIP = 150;
+var SHIP_COST = 12.00;
 
 function getCart() {
   try {
@@ -79,36 +90,8 @@ function saveCart(items) {
   renderCartUI();
 }
 
-/* Pack tiers: the bigger the pack, the deeper the discount. The advertised
-   percentage is the subscription rate; a one-time buy gives up 15 points of it. */
-var PACKS = [
-  { key: "single", label: "SINGLE", qty: 1, off: 0.30 },
-  { key: "two", label: "2-PACK", qty: 2, off: 0.40 },
-  { key: "six", label: "6-PACK", qty: 6, off: 0.48 }
-];
-var ONE_TIME_PENALTY = 0.15;
-
-function packByKey(key) {
-  for (var i = 0; i < PACKS.length; i++) if (PACKS[i].key === key) return PACKS[i];
-  return PACKS[0];
-}
-
-function packOff(pack, variant) {
-  return variant === "sub" ? pack.off : Math.max(0, pack.off - ONE_TIME_PENALTY);
-}
-
-function packPrice(p, pack, variant) {
-  return Math.round(p.price * pack.qty * (1 - packOff(pack, variant)) * 100) / 100;
-}
-
-function packLabel(item) {
-  return item.pack ? packByKey(item.pack).label + " · " : "";
-}
-
 function itemPrice(item) {
-  var p = getProductById(item.id);
-  if (item.pack) return packPrice(p, packByKey(item.pack), item.variant);
-  return item.variant === "sub" ? p.subPrice : p.price;
+  return getProductById(item.id).price;
 }
 
 function cartCount() {
@@ -119,14 +102,11 @@ function cartSubtotal() {
   return getCart().reduce(function (n, i) { return n + itemPrice(i) * i.qty; }, 0);
 }
 
-function addToCart(id, variant, qty, pack) {
+function addToCart(id, qty) {
   var items = getCart();
-  var key = pack || null;
-  var found = items.find(function (i) {
-    return i.id === id && i.variant === variant && (i.pack || null) === key;
-  });
+  var found = items.find(function (i) { return i.id === id; });
   if (found) found.qty += qty;
-  else items.push({ id: id, variant: variant, qty: qty, pack: key });
+  else items.push({ id: id, qty: qty });
   saveCart(items);
   openDrawer();
 }
@@ -150,15 +130,14 @@ function clearCart() {
 }
 
 /* ============================================================
-   Shared shell: announcement bar, header, footer, cart drawer
+   Shared shell
    ============================================================ */
 
 function shellHeaderHTML() {
   return '' +
   '<div class="announce">' +
     '<div class="announce-inner">' +
-      '<span>GLP-1 Support just dropped</span>' +
-      '<a class="announce-btn" href="product.html?id=glp1-support">Shop now &rarr;</a>' +
+      '<span>Research use only &middot; Not for human or veterinary use</span>' +
     '</div>' +
   '</div>' +
   '<header class="site-header">' +
@@ -166,16 +145,15 @@ function shellHeaderHTML() {
       '<button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">' +
         '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
       '</button>' +
-      '<a class="wordmark" href="index.html">NEXUS</a>' +
+      '<a class="wordmark" href="index.html">NEXUS <em>Research</em></a>' +
       '<nav class="main-nav" aria-label="Main">' +
-        '<a href="shop.html">Shop</a>' +
+        '<a href="shop.html">Catalog</a>' +
         '<a href="shop.html?cat=peptides">Peptides</a>' +
-        '<a href="shop.html?cat=daily">Daily</a>' +
-        '<a href="shop.html?cat=performance">Performance</a>' +
-        '<a href="shop.html?cat=vitality">Vitality</a>' +
+        '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
+        '<a href="shop.html?cat=supplies">Lab supplies</a>' +
       '</nav>' +
       '<div class="nav-right">' +
-        '<a class="nav-about" href="index.html#experts">About</a>' +
+        '<a class="nav-about" href="index.html#quality">Quality</a>' +
         '<button class="cart-btn" id="cartBtn" aria-label="Open cart">' +
           '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M6 8V7a6 6 0 0 1 12 0v1h2.5l-1.2 12.2A2 2 0 0 1 17.3 22H6.7a2 2 0 0 1-2-1.8L3.5 8H6zm2 0h8V7a4 4 0 0 0-8 0v1z" fill="currentColor"/></svg>' +
           '<span>Cart</span><span class="cart-count" id="cartCount">0</span>' +
@@ -183,18 +161,17 @@ function shellHeaderHTML() {
       '</div>' +
     '</div>' +
     '<div class="mobile-menu" id="mobileMenu">' +
-      '<a href="shop.html">Shop</a>' +
+      '<a href="shop.html">Catalog</a>' +
       '<a href="shop.html?cat=peptides">Peptides</a>' +
-      '<a href="shop.html?cat=daily">Daily</a>' +
-      '<a href="shop.html?cat=performance">Performance</a>' +
-      '<a href="shop.html?cat=vitality">Vitality</a>' +
-      '<a href="index.html#experts">About</a>' +
+      '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
+      '<a href="shop.html?cat=supplies">Lab supplies</a>' +
+      '<a href="index.html#quality">Quality</a>' +
     '</div>' +
   '</header>' +
   '<div class="drawer-overlay" id="drawerOverlay"></div>' +
   '<aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">' +
     '<div class="drawer-head">' +
-      '<h3>Your cart</h3>' +
+      '<h3>Your order</h3>' +
       '<button class="drawer-close" id="drawerClose" aria-label="Close cart">' +
         '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
       '</button>' +
@@ -209,26 +186,32 @@ function shellFooterHTML() {
   '<footer class="site-footer">' +
     '<div class="footer-inner">' +
       '<div class="footer-grid">' +
-        '<div class="footer-brand"><span class="footer-wordmark">NEXUS</span>' +
-          '<p>Peptide and performance formulas, independently verified and shipped fast. Documented ingredients from a source you can trace.</p></div>' +
-        '<div class="footer-col"><h4>Shop</h4>' +
-          '<a href="shop.html">Shop all</a>' +
+        '<div class="footer-brand"><span class="footer-wordmark">NEXUS <em>Research</em></span>' +
+          '<p>Laboratory reagents and consumables, independently tested with a certificate of analysis on every lot.</p>' +
+          '<p class="footer-badges"><span>HPLC + LC-MS</span><span>Tamper-sealed</span></p></div>' +
+        '<div class="footer-col"><h4>Catalog</h4>' +
+          '<a href="shop.html">All products</a>' +
           '<a href="shop.html?cat=peptides">Peptides</a>' +
-          '<a href="shop.html?cat=daily">Daily Essentials</a>' +
-          '<a href="shop.html?cat=performance">Performance</a>' +
-          '<a href="shop.html?cat=vitality">Vitality</a></div>' +
-        '<div class="footer-col"><h4>Learn</h4>' +
-          '<a href="index.html#science">Quality &amp; testing</a>' +
-          '<a href="index.html#experts">Experts</a>' +
+          '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
+          '<a href="shop.html?cat=supplies">Lab supplies</a></div>' +
+        '<div class="footer-col"><h4>Company</h4>' +
+          '<a href="index.html#quality">Quality &amp; testing</a>' +
+          '<a href="index.html#coa">Certificates</a>' +
+          '<a href="index.html#shipping">Shipping &amp; handling</a>' +
           '<a href="index.html#faq">FAQ</a></div>' +
         '<div class="footer-col"><h4>Support</h4>' +
-          '<a href="mailto:support@nexushealth.co">support@nexushealth.co</a>' +
-          '<a href="index.html#faq">Shipping</a>' +
+          '<a href="mailto:support@nexusresearch.co">support@nexusresearch.co</a>' +
+          '<a href="index.html#faq">Wholesale</a>' +
           '<a href="index.html#faq">Returns</a></div>' +
       '</div>' +
       '<div class="footer-fine">' +
-        '<p>Nothing on this site constitutes medical advice. These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat, cure, or prevent any disease.</p>' +
-        '<p>&copy; 2026 Nexus Health. All rights reserved.</p>' +
+        '<p><strong>DISCLAIMER</strong> &mdash; All products sold by Nexus Research are intended for ' +
+        'laboratory research use only. They are not for human or animal consumption of any kind, and are ' +
+        'not drugs, foods, cosmetics, or dietary supplements. Nothing on this site constitutes medical advice ' +
+        'or a recommendation regarding the use of any compound, and no statement here has been evaluated by ' +
+        'the Food and Drug Administration. Purchasers confirm that they are qualified to handle research ' +
+        'chemicals and assume all responsibility for safe and lawful use.</p>' +
+        '<p>&copy; 2026 Nexus Research. All rights reserved.</p>' +
       '</div>' +
     '</div>' +
   '</footer>';
@@ -256,7 +239,7 @@ function renderCartUI() {
   if (!itemsEl || !footEl) return;
 
   if (items.length === 0) {
-    itemsEl.innerHTML = '<div class="drawer-empty"><p>Your cart is empty.</p><a class="btn btn-primary" href="shop.html">Start shopping</a></div>';
+    itemsEl.innerHTML = '<div class="drawer-empty"><p>Your order is empty.</p><a class="btn btn-primary" href="shop.html">Browse the catalog</a></div>';
     footEl.innerHTML = "";
     return;
   }
@@ -267,7 +250,7 @@ function renderCartUI() {
       '<a class="drawer-thumb" href="product.html?id=' + esc(p.id) + '">' + productImg(p) + '</a>' +
       '<div class="drawer-item-info">' +
         '<a class="drawer-item-name" href="product.html?id=' + esc(p.id) + '">' + esc(p.name) + '</a>' +
-        '<span class="drawer-item-variant">' + esc(packLabel(item)) + (item.variant === "sub" ? "Subscription" : "One-time") + '</span>' +
+        '<span class="drawer-item-variant">' + esc(p.size) + (p.purity ? " &middot; " + esc(p.purity) : "") + '</span>' +
         '<div class="drawer-item-row">' +
           '<span class="qty-stepper">' +
             '<button data-qty="-1" data-idx="' + idx + '" aria-label="Decrease quantity">&minus;</button>' +
@@ -285,8 +268,8 @@ function renderCartUI() {
   var away = FREE_SHIP - sub;
   var pct = Math.min(100, (sub / FREE_SHIP) * 100);
   var shipMsg = away > 0
-    ? "You're " + money(Math.round(away * 100) / 100) + " away from free shipping"
-    : "Free shipping unlocked 🎉";
+    ? money(Math.round(away * 100) / 100) + " from free shipping"
+    : "Free shipping applied";
 
   footEl.innerHTML =
     '<div class="ship-progress">' +
@@ -327,140 +310,19 @@ function initShell() {
   });
 
   renderCartUI();
-  initQuiz();
 }
 
 /* ============================================================
-   Find your routine quiz
-   ============================================================ */
-
-var QUIZ_FORM = {
-  capsule: ["glp1-support", "digestive-enzyme", "ashwagandha-plus", "libido-strips"],
-  powder: ["collagen-chocolate", "creatine-hydration", "colostrum", "mushroom-coffee", "shilajit"]
-};
-var QUIZ_GOAL = {
-  energy: ["shilajit", "mushroom-coffee", "creatine-hydration"],
-  calm: ["ashwagandha-plus", "colostrum", "digestive-enzyme"],
-  strength: ["creatine-hydration", "collagen-chocolate", "glp1-support"],
-  gut: ["digestive-enzyme", "colostrum", "ashwagandha-plus"],
-  metabolism: ["glp1-support", "digestive-enzyme", "mushroom-coffee"]
-};
-var QUIZ_STEPS = [
-  { q: "What are you optimizing for first?", opts: [
-    { label: "Energy and focus", value: "energy" },
-    { label: "Sleep and stress", value: "calm" },
-    { label: "Strength and recovery", value: "strength" },
-    { label: "Gut and daily health", value: "gut" },
-    { label: "Metabolism and weight", value: "metabolism" }
-  ], key: "goal" },
-  { q: "How do you like to take things?", opts: [
-    { label: "Capsules, quick and simple", value: "capsule" },
-    { label: "Powders and drinks", value: "powder" },
-    { label: "No preference, whatever works", value: "any" }
-  ], key: "form" },
-  { q: "Where are you starting from?", opts: [
-    { label: "Just testing the waters", value: "one" },
-    { label: "Ready to commit to a routine", value: "sub" }
-  ], key: "commit" }
-];
-
-function quizRecommend(ans) {
-  var pool = (QUIZ_GOAL[ans.goal] || []).slice();
-  if (ans.form === "capsule" || ans.form === "powder") {
-    var pref = QUIZ_FORM[ans.form];
-    pool.sort(function (a, b) { return (pref.indexOf(b) !== -1) - (pref.indexOf(a) !== -1); });
-  }
-  PRODUCTS.forEach(function (p) { if (pool.indexOf(p.id) === -1) pool.push(p.id); });
-  return pool.slice(0, 3);
-}
-
-function initQuiz() {
-  var ov = document.createElement("div");
-  ov.className = "quiz-overlay";
-  ov.id = "quizOverlay";
-  ov.innerHTML =
-    '<button class="quiz-close" id="quizClose" aria-label="Close quiz">' +
-      '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
-    '</button>' +
-    '<div class="quiz-inner"><div class="quiz-progress-track"><div class="quiz-progress-bar" id="quizBar"></div></div>' +
-    '<div id="quizBody"></div></div>';
-  document.body.appendChild(ov);
-
-  var state = { step: 0, ans: {} };
-
-  function renderStep() {
-    var body = document.getElementById("quizBody");
-    document.getElementById("quizBar").style.width = ((state.step) / QUIZ_STEPS.length * 100) + "%";
-    if (state.step >= QUIZ_STEPS.length) { renderResult(); return; }
-    var s = QUIZ_STEPS[state.step];
-    body.innerHTML =
-      '<span class="quiz-step-count">Step ' + (state.step + 1) + ' of ' + QUIZ_STEPS.length + '</span>' +
-      '<h2 class="quiz-q">' + esc(s.q) + '</h2>' +
-      '<div class="quiz-options">' + s.opts.map(function (o) {
-        return '<button class="quiz-opt" data-val="' + esc(o.value) + '"><span class="dot"></span>' + esc(o.label) + '</button>';
-      }).join("") + '</div>' +
-      (state.step > 0 ? '<button class="quiz-back" id="quizBack">&larr; Back</button>' : '');
-    body.querySelectorAll(".quiz-opt").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        state.ans[s.key] = btn.getAttribute("data-val");
-        state.step++;
-        renderStep();
-      });
-    });
-    var back = document.getElementById("quizBack");
-    if (back) back.addEventListener("click", function () { state.step--; renderStep(); });
-  }
-
-  function renderResult() {
-    document.getElementById("quizBar").style.width = "100%";
-    var recs = quizRecommend(state.ans).map(getProductById).filter(Boolean);
-    var variant = state.ans.commit === "sub" ? "sub" : "one";
-    var body = document.getElementById("quizBody");
-    body.innerHTML =
-      '<span class="quiz-step-count">Your routine</span>' +
-      '<h2 class="quiz-result-head">Built for your biology.</h2>' +
-      '<p class="quiz-result-sub">Based on your answers, this is where we would start you.</p>' +
-      '<div class="quiz-rec-grid">' + recs.map(function (p) {
-        return '<a class="quiz-rec" href="product.html?id=' + esc(p.id) + '">' +
-          '<div class="art">' + productImg(p) + '</div>' +
-          '<div class="rb"><h4>' + esc(p.name) + '</h4><div class="rp">' + money(variant === "sub" ? p.subPrice : p.price) + (variant === "sub" ? "/mo" : "") + '</div></div>' +
-        '</a>';
-      }).join("") + '</div>' +
-      '<button class="btn btn-primary quiz-addall" id="quizAddAll">Add all to cart</button>' +
-      '<button class="quiz-restart" id="quizRestart">Start over</button>';
-    document.getElementById("quizAddAll").addEventListener("click", function () {
-      recs.forEach(function (p) { addToCart(p.id, variant, 1); });
-      closeQuiz();
-    });
-    document.getElementById("quizRestart").addEventListener("click", function () {
-      state.step = 0; state.ans = {}; renderStep();
-    });
-  }
-
-  function openQuiz() { state.step = 0; state.ans = {}; renderStep(); ov.classList.add("open"); document.body.classList.add("drawer-lock"); }
-  function closeQuiz() { ov.classList.remove("open"); document.body.classList.remove("drawer-lock"); }
-  window.__openQuiz = openQuiz;
-
-  document.getElementById("quizClose").addEventListener("click", closeQuiz);
-  ov.addEventListener("click", function (e) { if (e.target === ov) closeQuiz(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeQuiz(); });
-  document.querySelectorAll(".quiz-open-btn").forEach(function (b) {
-    b.addEventListener("click", function (e) { e.preventDefault(); openQuiz(); });
-  });
-}
-
-/* ============================================================
-   Scroll reveal + animated counters
+   Scroll reveal, counters, motion
    ============================================================ */
 
 function initReveal() {
   if (!("IntersectionObserver" in window)) return;
-  var sel = ".stats-band, .feature-grid, .timeline-card, .cat-card, .expert-card, .review-card, .goal-tile, .science-grid, .guide-card, .lineup-head, .acc-item, .promo-card, .lineup-grid .product-card";
+  var sel = ".stats-band, .spec-card, .cat-card, .guide-card, .acc-item, .lineup-grid .product-card, .promise-card";
   var els = [].slice.call(document.querySelectorAll(sel));
   if (!els.length) return;
   els.forEach(function (el) {
     el.classList.add("reveal");
-    // Stagger siblings so grids cascade in rather than pop as a block
     var sibs = [].slice.call(el.parentElement.children).filter(function (c) {
       return c.classList.contains("reveal");
     });
@@ -475,10 +337,34 @@ function initReveal() {
   els.forEach(function (el) { obs.observe(el); });
 }
 
-/* ============================================================
-   Motion layer: parallax, card spotlight, magnetic CTAs
-   All of it sits behind a reduced-motion check.
-   ============================================================ */
+function initCounters() {
+  var band = document.querySelector(".stats-band");
+  if (!band || !("IntersectionObserver" in window)) return;
+  var nums = [].slice.call(band.querySelectorAll(".stat strong"));
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      obs.disconnect();
+      nums.forEach(function (el) {
+        var raw = el.textContent;
+        var m = raw.match(/^([\d.]+)(.*)$/);
+        if (!m) return;
+        var target = parseFloat(m[1]);
+        var decimals = (m[1].split(".")[1] || "").length;
+        var suffix = m[2], start = null, dur = 1100;
+        function tick(t) {
+          if (start === null) start = t;
+          var pr = Math.min(1, (t - start) / dur);
+          var eased = 1 - Math.pow(1 - pr, 3);
+          el.textContent = (eased * target).toFixed(decimals) + suffix;
+          if (pr < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    });
+  }, { threshold: 0.5 });
+  obs.observe(band);
+}
 
 function prefersReducedMotion() {
   return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -487,7 +373,6 @@ function prefersReducedMotion() {
 function initMotion() {
   if (prefersReducedMotion()) return;
 
-  // 1. Hero parallax: background drifts slower than the page
   var heroImg = document.querySelector(".hero-lux-bg img");
   if (heroImg) {
     var heroH = 0, ticking = false;
@@ -497,18 +382,15 @@ function initMotion() {
       var y = window.scrollY;
       if (y <= heroH) heroImg.style.transform = "translate3d(0," + Math.round(y * 0.28) + "px,0) scale(1.1)";
     }
-    measure();
-    apply();
+    measure(); apply();
     window.addEventListener("resize", measure);
     window.addEventListener("scroll", function () {
       if (!ticking) { ticking = true; requestAnimationFrame(apply); }
     }, { passive: true });
   }
 
-  // 2 + 3. Cursor spotlight on cards, magnetic CTAs. Delegated from the
-  // document so cards re-rendered by filters keep the behavior.
-  var spotSel = ".product-card, .goal-tile, .cat-card, .offer-box, .member-card";
-  var magSel = ".hero-lux .btn, .lineup-grid .card-add, .card-add, .pdp-add, .lineup-foot .btn, .sticky-add";
+  var spotSel = ".product-card, .cat-card, .promise-card, .spec-card";
+  var magSel = ".hero-lux .btn, .card-add, .pdp-add, .lineup-foot .btn, .sticky-add";
   var lastMag = null;
 
   document.addEventListener("mousemove", function (e) {
@@ -534,12 +416,11 @@ function initMotion() {
   }, { passive: true });
 }
 
-/* Cart badge pulse + button confirmation after any add */
 function addFeedback(btn) {
   var badge = document.getElementById("cartCount");
   if (badge) {
     badge.classList.remove("pulse");
-    void badge.offsetWidth; // restart animation
+    void badge.offsetWidth;
     badge.classList.add("pulse");
   }
   if (btn && !btn.dataset.busy) {
@@ -555,59 +436,34 @@ function addFeedback(btn) {
   }
 }
 
-function initCounters() {
-  var band = document.querySelector(".stats-band");
-  if (!band || !("IntersectionObserver" in window)) return;
-  var nums = [].slice.call(band.querySelectorAll(".stat strong"));
-  var obs = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
-      if (!en.isIntersecting) return;
-      obs.disconnect();
-      nums.forEach(function (el) {
-        var raw = el.textContent;
-        var m = raw.match(/^(\d+)(.*)$/);
-        if (!m) return;
-        var target = parseInt(m[1], 10), suffix = m[2], start = null, dur = 1100;
-        function tick(t) {
-          if (start === null) start = t;
-          var p = Math.min(1, (t - start) / dur);
-          var eased = 1 - Math.pow(1 - p, 3);
-          el.textContent = Math.round(eased * target) + suffix;
-          if (p < 1) requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-      });
-    });
-  }, { threshold: 0.5 });
-  obs.observe(band);
-}
-
 /* ============================================================
-   Shared product card (shop grid, lineup, pairs-well-with)
+   Product card: identity data, no ratings or urgency
    ============================================================ */
 
-function productCardHTML(p, opts) {
-  opts = opts || {};
-  var badge = p.badge ? '<span class="badge">' + esc(p.badge) + '</span>' : "";
-  return '<div class="product-card' + (opts.lineup ? " lineup-card" : "") + (p.badge && !opts.lineup ? " featured" : "") + '">' +
+function productCardHTML(p) {
+  var specs = [];
+  if (p.cas) specs.push('<span><i>CAS</i>' + esc(p.cas) + '</span>');
+  specs.push('<span><i>Size</i>' + esc(p.size) + '</span>');
+  if (p.purity) specs.push('<span><i>Purity</i>' + esc(p.purity) + '</span>');
+
+  return '<div class="product-card">' +
     '<a class="card-link" href="product.html?id=' + esc(p.id) + '">' +
-      '<div class="card-art">' + badge + productImg(p) + '</div>' +
+      '<div class="card-art">' + productImg(p) + '</div>' +
       '<div class="card-body">' +
-        '<h3 class="card-name">' + esc(p.name) + '</h3>' +
         '<span class="card-sub">' + esc(p.subtitle) + '</span>' +
-        '<p class="card-tag">' + esc(p.tagline) + '</p>' +
-        '<div class="card-rating">' + starsSVG(p.rating) + '<span>' + p.rating + ' (' + fmtCount(p.reviews) + ')</span></div>' +
-        '<div class="card-price"><span class="from-lbl">From</span><strong>' + money(p.subPrice) + '/mo</strong></div>' +
+        '<h3 class="card-name">' + esc(p.name) + '</h3>' +
+        '<div class="card-specs">' + specs.join("") + '</div>' +
+        '<div class="card-price"><strong>' + money(p.price) + '</strong></div>' +
       '</div>' +
     '</a>' +
-    '<button class="btn btn-primary card-add" data-add="' + esc(p.id) + '">Add to cart</button>' +
+    '<button class="btn btn-primary card-add" data-add="' + esc(p.id) + '">Add to order</button>' +
   '</div>';
 }
 
 function bindCardAdds(container) {
   container.querySelectorAll("[data-add]").forEach(function (btn) {
     btn.addEventListener("click", function () {
-      addToCart(btn.getAttribute("data-add"), "one", 1);
+      addToCart(btn.getAttribute("data-add"), 1);
       addFeedback(btn);
     });
   });
@@ -618,32 +474,48 @@ function bindCardAdds(container) {
    ============================================================ */
 
 function initHome() {
-  // Featured product spotlight add-to-cart
-  var fc = document.getElementById("featureCard");
-  if (fc) bindCardAdds(fc);
-
-  // Product lineup scroller (dark section)
-  var scroller = document.getElementById("lineupScroller");
-  if (scroller) {
-    var lineupIds = ["glp1-support", "collagen-chocolate", "colostrum", "creatine-hydration", "ashwagandha-plus", "shilajit", "mushroom-coffee", "digestive-enzyme"];
-    scroller.innerHTML = lineupIds.map(function (id) {
-      return productCardHTML(getProductById(id));
-    }).join("");
-    bindCardAdds(scroller);
+  var grid = document.getElementById("lineupScroller");
+  if (grid) {
+    grid.innerHTML = PRODUCTS.map(function (p) { return productCardHTML(p); }).join("");
+    bindCardAdds(grid);
   }
 
-  // "See how we test" disclosure
   var testToggle = document.getElementById("testToggle");
   var testDetail = document.getElementById("testDetail");
   if (testToggle && testDetail) {
     testToggle.addEventListener("click", function () {
       var open = testDetail.classList.toggle("open");
-      testToggle.textContent = open ? "Hide testing details" : "See how we test";
+      testToggle.textContent = open ? "Hide method detail" : "See our testing method";
       testToggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
   }
 
-  // Email capture
+  // COA lookup: resolves a lot number to its product record
+  var coaForm = document.getElementById("coaForm");
+  if (coaForm) {
+    coaForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var q = document.getElementById("coaInput").value.trim().toLowerCase();
+      var out = document.getElementById("coaResult");
+      if (!q) { out.innerHTML = ""; return; }
+      var hit = PRODUCTS.find(function (p) {
+        return (p.lot && p.lot.toLowerCase() === q) ||
+               p.name.toLowerCase().indexOf(q) !== -1 ||
+               (p.cas && p.cas === q);
+      });
+      if (hit) {
+        out.innerHTML = '<div class="coa-hit">' +
+          '<span class="coa-lot">' + esc(hit.lot) + '</span>' +
+          '<span class="coa-name">' + esc(hit.name) + ' &middot; ' + esc(hit.purity) + ' by ' + esc(hit.method) + '</span>' +
+          '<a class="text-btn" href="product.html?id=' + esc(hit.id) + '">View product &rarr;</a>' +
+          '<p class="coa-note">Email support with this lot number and we will send the signed certificate for it.</p>' +
+        '</div>';
+      } else {
+        out.innerHTML = '<p class="coa-miss">No lot matching that reference. Search by lot number (for example NR-2601-A), product name, or CAS.</p>';
+      }
+    });
+  }
+
   var form = document.getElementById("guideForm");
   if (form) {
     form.addEventListener("submit", function (e) {
@@ -656,12 +528,9 @@ function initHome() {
     });
   }
 
-  // FAQ accordion (one open at a time)
   initAccordions(document);
 }
 
-/* Accordion helper: works for FAQ and PDP accordions.
-   Scoped one-open-at-a-time per .acc-group. */
 function initAccordions(root) {
   root.querySelectorAll(".acc-group").forEach(function (group) {
     group.querySelectorAll(".acc-q").forEach(function (btn) {
@@ -682,20 +551,13 @@ function initAccordions(root) {
 }
 
 /* ============================================================
-   Shop page
+   Catalog page
    ============================================================ */
 
-var GOAL_TITLES = {
-  muscle: "Build muscle",
-  recovery: "Recover faster",
-  sleep: "Sleep deeper",
-  focus: "Sharpen focus"
-};
 var CAT_TITLES = {
   peptides: "Peptides",
-  daily: "Daily Essentials",
-  performance: "Performance",
-  vitality: "Vitality"
+  biochemicals: "Biochemicals",
+  supplies: "Lab supplies"
 };
 
 function initShop() {
@@ -704,89 +566,41 @@ function initShop() {
   var sub = document.getElementById("shopSub");
   var chips = document.querySelectorAll("#chipRow .chip");
 
-  function applyFilter(cat, goal, updateUrl) {
+  function applyFilter(cat, updateUrl) {
     var list = PRODUCTS.filter(function (p) {
-      if (goal) return p.goals.indexOf(goal) !== -1;
-      if (cat && cat !== "all") return p.category === cat;
-      return true;
+      return (cat && cat !== "all") ? p.category === cat : true;
     });
 
-    title.textContent = goal ? GOAL_TITLES[goal] : (cat && cat !== "all" ? CAT_TITLES[cat] : "Shop all");
-    sub.textContent = list.length + (list.length === 1 ? " product" : " products");
+    title.textContent = (cat && cat !== "all") ? CAT_TITLES[cat] : "Full catalog";
+    sub.textContent = list.length + (list.length === 1 ? " product" : " products") +
+      " · every lot tested, certificate on file";
 
     grid.innerHTML = list.map(function (p) { return productCardHTML(p); }).join("");
     bindCardAdds(grid);
 
     chips.forEach(function (chip) {
-      var active = goal
-        ? chip.getAttribute("data-goal") === goal
-        : chip.getAttribute("data-cat") === (cat || "all");
-      chip.classList.toggle("active", active);
+      chip.classList.toggle("active", chip.getAttribute("data-cat") === (cat || "all"));
     });
 
     if (updateUrl) {
-      var url = "shop.html";
-      if (goal) url += "?goal=" + goal;
-      else if (cat && cat !== "all") url += "?cat=" + cat;
-      history.replaceState(null, "", url);
+      history.replaceState(null, "", "shop.html" + (cat && cat !== "all" ? "?cat=" + cat : ""));
     }
   }
 
   chips.forEach(function (chip) {
     chip.addEventListener("click", function () {
-      applyFilter(chip.getAttribute("data-cat"), chip.getAttribute("data-goal"), true);
+      applyFilter(chip.getAttribute("data-cat"), true);
     });
   });
 
   var cat = qs("cat");
-  var goal = qs("goal");
   if (cat && !CAT_TITLES[cat]) cat = null;
-  if (goal && !GOAL_TITLES[goal]) goal = null;
-  applyFilter(cat || "all", goal, false);
+  applyFilter(cat || "all", false);
 }
 
 /* ============================================================
-   Product detail page
+   Product detail: specification sheet
    ============================================================ */
-
-var GOAL_CHIPS = {
-  muscle: "Builds strength",
-  recovery: "Speeds recovery",
-  sleep: "Deeper sleep",
-  focus: "Sharper focus"
-};
-
-/* Countdown on the limited-time offer. The window is held in sessionStorage so
-   it keeps ticking across pages instead of resetting on every render. */
-var OFFER_MS = 15 * 60 * 1000;
-
-function initOfferClock() {
-  var minEl = document.getElementById("offMin");
-  var secEl = document.getElementById("offSec");
-  if (!minEl || !secEl) return;
-
-  var endAt = parseInt(sessionStorage.getItem("vital_offer_end") || "0", 10);
-  if (!endAt || endAt <= Date.now()) {
-    endAt = Date.now() + OFFER_MS;
-    sessionStorage.setItem("vital_offer_end", String(endAt));
-  }
-
-  function pad(n) { return n < 10 ? "0" + n : String(n); }
-
-  function tick() {
-    var left = endAt - Date.now();
-    if (left <= 0) {
-      endAt = Date.now() + OFFER_MS;
-      sessionStorage.setItem("vital_offer_end", String(endAt));
-      left = OFFER_MS;
-    }
-    minEl.textContent = pad(Math.floor(left / 60000));
-    secEl.textContent = pad(Math.floor((left % 60000) / 1000));
-  }
-
-  tick();
-  setInterval(tick, 1000);
-}
 
 function initProduct() {
   var root = document.getElementById("pdpRoot");
@@ -795,215 +609,144 @@ function initProduct() {
   if (!p) {
     root.innerHTML =
       '<div class="pdp-notfound">' +
-        '<h1>We couldn\'t find that one.</h1>' +
-        '<p>The product may have moved or the link is off. The full lineup is one click away.</p>' +
-        '<a class="btn btn-primary" href="shop.html">Shop all products</a>' +
+        '<h1>No record for that reference.</h1>' +
+        '<p>The catalog number may have changed or the link is incomplete.</p>' +
+        '<a class="btn btn-primary" href="shop.html">Browse the catalog</a>' +
       '</div>';
     return;
   }
 
-  document.title = p.name + " | Nexus Health";
+  document.title = p.name + " | Nexus Research";
 
-  var benefitChips = p.goals.map(function (g) { return GOAL_CHIPS[g]; });
-  ["Third-party tested", "Clinical doses", "No fillers"].forEach(function (c) {
-    if (benefitChips.length < 3 && benefitChips.indexOf(c) === -1) benefitChips.push(c);
-  });
-  benefitChips = benefitChips.slice(0, 3);
+  var specRows = [
+    ["Catalog number", p.lot],
+    ["CAS number", p.cas],
+    ["Molecular formula", p.formula],
+    ["Molecular weight", p.mw],
+    ["Sequence", p.sequence],
+    ["Unit size", p.size],
+    ["Purity", p.purity],
+    ["Analytical method", p.method],
+    ["Physical form", p.form],
+    ["Solubility", p.solubility]
+  ].filter(function (r) { return r[1]; })
+   .map(function (r) {
+     return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td></tr>';
+   }).join("");
 
-  var ingRows = p.ingredients.map(function (ing) {
-    return '<tr><td>' + esc(ing.name) + '</td><td>' + esc(ing.dose) + '</td></tr>';
+  var appItems = (p.apps || []).map(function (a) {
+    return '<li>' + esc(a) + '</li>';
   }).join("");
 
   root.innerHTML =
     '<nav class="breadcrumb" aria-label="Breadcrumb">' +
-      '<a href="shop.html">Shop</a><span>/</span>' +
+      '<a href="shop.html">Catalog</a><span>/</span>' +
       '<a href="shop.html?cat=' + esc(p.category) + '">' + esc(CAT_TITLES[p.category]) + '</a><span>/</span>' +
       '<span class="crumb-here">' + esc(p.name) + '</span>' +
     '</nav>' +
     '<div class="pdp-grid">' +
       '<div class="pdp-left">' +
         '<div class="pdp-art">' + productImg(p, true) + '</div>' +
-        '<div class="pdp-chips">' + benefitChips.map(function (c) {
-          return '<span class="pill-chip">' + esc(c) + '</span>';
-        }).join("") + '</div>' +
+        '<div class="pdp-chips">' +
+          '<span class="pill-chip">Research use only</span>' +
+          '<span class="pill-chip">Lot ' + esc(p.lot) + '</span>' +
+          '<span class="pill-chip">COA on file</span>' +
+        '</div>' +
       '</div>' +
       '<div class="pdp-right">' +
-        (p.badge ? '<span class="badge badge-inline">' + esc(p.badge) + '</span>' : "") +
-        '<h1 class="pdp-title">' + esc(p.name) + '</h1>' +
         '<span class="pdp-subtitle">' + esc(p.subtitle) + '</span>' +
-        '<div class="card-rating pdp-rating">' + starsSVG(p.rating) + '<span>' + p.rating + ' (' + fmtCount(p.reviews) + ' reviews)</span></div>' +
-        '<div class="offer-box">' +
-          '<div class="save-strip" aria-hidden="true"><div class="save-track" id="saveTrack"></div></div>' +
-          '<div class="offer-body">' +
-            '<div class="offer-row">' +
-              '<span class="offer-label">' +
-                '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M7 3h10M7 21h10M8 3v3.6c0 1.5 4 3.4 4 5.4s-4 3.9-4 5.4V21M16 3v3.6c0 1.5-4 3.4-4 5.4s4 3.9 4 5.4V21" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>' +
-                'LIMITED TIME OFFER</span>' +
-              '<span class="offer-clock"><b id="offMin">15</b><i>:</i><b id="offSec">00</b></span>' +
-            '</div>' +
-            '<div class="offer-row offer-price-row">' +
-              '<span class="offer-cta">GET YOURS NOW FOR</span>' +
-              '<span class="offer-price"><strong id="offerNow"></strong><s id="offerWas"></s></span>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="pdp-perks">' +
-          '<div class="perk perk-strong">' +
-            '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M3 7.2l9-4 9 4v9.6l-9 4-9-4V7.2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 7.2l9 4 9-4M12 11.2v9.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>' +
-            '<span id="shipLine"></span>' +
-          '</div>' +
-          '<div class="perk">' +
-            '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.4-5.9M20 12a8 8 0 0 1-13.4 5.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M18.5 2.5V7h-4.5M5.5 21.5V17H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-            '<span>Recurring subscription (see below for details)</span>' +
-          '</div>' +
-          '<div class="perk">' +
-            '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 3v4h4M10 12h5M10 16h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' +
-            '<span>COA for your exact batch, available on request</span>' +
-          '</div>' +
-        '</div>' +
-        '<h3 class="pdp-select-head">Select your quantity</h3>' +
-        '<div class="pack-row" id="packRow" role="radiogroup" aria-label="Quantity">' +
-          PACKS.map(function (pk, i) {
-            return '<button class="pack-pill' + (i === 0 ? " active" : "") + '" data-pack="' + esc(pk.key) + '" role="radio" aria-checked="' + (i === 0 ? "true" : "false") + '">' +
-              '<span class="pack-name">' + esc(pk.label) + '</span>' +
-              '<span class="pack-badge">' + Math.round(pk.off * 100) + '% OFF</span>' +
-            '</button>';
-          }).join("") +
-        '</div>' +
-        '<div class="pdp-note"><span class="note-dot" aria-hidden="true"></span>Most customers pick the 2-pack</div>' +
-        '<h3 class="pdp-select-head">Select your plan</h3>' +
-        '<div class="option-cards" role="radiogroup" aria-label="Purchase options">' +
-          '<label class="option-card selected">' +
-            '<input type="radio" name="variant" value="sub" checked>' +
-            '<span class="option-title">Subscribe &amp; save</span>' +
-            '<span class="option-sub" id="optSubLine"></span>' +
-          '</label>' +
-          '<label class="option-card">' +
-            '<input type="radio" name="variant" value="one">' +
-            '<span class="option-title">One-time purchase</span>' +
-            '<span class="option-sub" id="optOneLine"></span>' +
-          '</label>' +
-        '</div>' +
-        '<div class="pdp-buy-row">' +
-          '<span class="qty-stepper qty-lg">' +
-            '<button id="qtyDown" aria-label="Decrease quantity">&minus;</button>' +
-            '<span id="qtyVal">1</span>' +
-            '<button id="qtyUp" aria-label="Increase quantity">+</button>' +
-          '</span>' +
-          '<button class="btn btn-primary pdp-add" id="pdpAdd">Add to cart &middot; <span id="pdpAddPrice"></span></button>' +
-        '</div>' +
+        '<h1 class="pdp-title">' + esc(p.name) + '</h1>' +
         '<p class="pdp-tagline">' + esc(p.tagline) + '</p>' +
-        '<p class="pdp-desc">' + esc(p.description) + '</p>' +
+
+        '<div class="ruo-flag">' +
+          '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l9 16H3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9v5M12 16.5v.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
+          '<span>For in-vitro laboratory research only. Not a drug, food, cosmetic, or supplement. Not for human or veterinary use.</span>' +
+        '</div>' +
+
+        '<div class="pdp-buy-block">' +
+          '<div class="pdp-buy-price"><strong>' + money(p.price) + '</strong><span>' + esc(p.size) + '</span></div>' +
+          '<div class="pdp-buy-row">' +
+            '<span class="qty-stepper qty-lg">' +
+              '<button id="qtyDown" aria-label="Decrease quantity">&minus;</button>' +
+              '<span id="qtyVal">1</span>' +
+              '<button id="qtyUp" aria-label="Increase quantity">+</button>' +
+            '</span>' +
+            '<button class="btn btn-primary pdp-add" id="pdpAdd">Add to order &middot; <span id="pdpAddPrice">' + money(p.price) + '</span></button>' +
+          '</div>' +
+          '<div class="pdp-perks">' +
+            '<div class="perk"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 3v4h4M10 12h5M10 16h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Certificate of analysis for lot ' + esc(p.lot) + ', on request</span></div>' +
+            '<div class="perk"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M3 7.2l9-4 9 4v9.6l-9 4-9-4V7.2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span>Ships in 1 business day, plain tamper-evident packaging</span></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<h2 class="spec-head">Specification</h2>' +
+        '<table class="spec-table"><tbody>' + specRows + '</tbody></table>' +
+
         '<div class="acc-group pdp-accs">' +
           '<div class="acc-item">' +
-            '<button class="acc-q" aria-expanded="false"><span>Ingredients</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
-            '<div class="acc-a"><table class="dose-table"><thead><tr><th>Ingredient</th><th>Per serving</th></tr></thead><tbody>' + ingRows + '</tbody></table></div>' +
+            '<button class="acc-q" aria-expanded="false"><span>Description</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
+            '<div class="acc-a"><p>' + esc(p.description) + '</p></div>' +
           '</div>' +
+          (appItems ? '<div class="acc-item">' +
+            '<button class="acc-q" aria-expanded="false"><span>Research applications</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
+            '<div class="acc-a"><ul class="app-list">' + appItems + '</ul></div>' +
+          '</div>' : "") +
           '<div class="acc-item">' +
-            '<button class="acc-q" aria-expanded="false"><span>How to use</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
-            '<div class="acc-a"><p>' + esc(p.howToUse) + '</p></div>' +
+            '<button class="acc-q" aria-expanded="false"><span>Handling &amp; storage</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
+            '<div class="acc-a"><p>' + esc(p.storage) + '</p>' +
+            '<p>Handle in accordance with your institution&rsquo;s chemical hygiene plan. Use appropriate personal protective equipment. Not for use in humans or animals.</p></div>' +
           '</div>' +
           '<div class="acc-item">' +
             '<button class="acc-q" aria-expanded="false"><span>Shipping &amp; returns</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
-            '<div class="acc-a"><p>In-stock orders are fulfilled within 1 business day and ship tracked, in plain, tamper-evident packaging. Free shipping over $75, otherwise a flat $6.95. Not feeling it? Email us within 30 days for a full refund, even on opened products.</p></div>' +
+            '<div class="acc-a"><p>In-stock items are dispatched within 1 business day and ship tracked in plain, tamper-evident packaging. Free shipping on orders over ' + money(FREE_SHIP) + ', otherwise a flat ' + money(SHIP_COST) + '. Unopened items may be returned within 30 days. Opened reagents cannot be returned once the seal is broken.</p></div>' +
           '</div>' +
         '</div>' +
       '</div>' +
     '</div>' +
     '<section class="pairs-section">' +
-      '<h2>Pairs well with</h2>' +
+      '<h2>Related items</h2>' +
       '<div class="pairs-grid" id="pairsGrid"></div>' +
     '</section>';
 
-  // Pack + plan selection
   var qty = 1;
-  var variant = "sub";
-  var pack = PACKS[0];
   var qtyVal = document.getElementById("qtyVal");
 
   function refresh() {
-    var unit = packPrice(p, pack, variant);
-    var was = Math.round(p.price * pack.qty * 100) / 100;
-    var off = Math.round(packOff(pack, variant) * 100);
-    var lineTotal = Math.round(unit * qty * 100) / 100;
-
-    document.getElementById("offerNow").textContent = money(unit);
-    document.getElementById("offerWas").textContent = money(was);
-    document.getElementById("pdpAddPrice").textContent = money(lineTotal);
-
-    var cell = "<span>SAVE " + off + "%</span>";
-    document.getElementById("saveTrack").innerHTML = cell.repeat(16);
-
-    document.getElementById("shipLine").textContent = lineTotal >= FREE_SHIP
-      ? "THIS ORDER SHIPS FREE"
-      : "FREE SHIPPING ON ORDERS OVER " + money(FREE_SHIP);
-
-    document.getElementById("optSubLine").textContent =
-      money(packPrice(p, pack, "sub")) + ", " + Math.round(pack.off * 100) + "% off, cancel anytime";
-    document.getElementById("optOneLine").textContent =
-      money(packPrice(p, pack, "one")) + ", " + Math.round(packOff(pack, "one") * 100) + "% off";
+    document.getElementById("pdpAddPrice").textContent = money(Math.round(p.price * qty * 100) / 100);
+    var sp = document.getElementById("stickyPrice");
+    if (sp) {
+      sp.textContent = money(Math.round(p.price * qty * 100) / 100);
+      document.getElementById("stickyMeta").textContent = p.size + (qty > 1 ? " · ×" + qty : "");
+    }
   }
-
-  root.querySelectorAll(".pack-pill").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      pack = packByKey(btn.getAttribute("data-pack"));
-      root.querySelectorAll(".pack-pill").forEach(function (b) {
-        var on = b === btn;
-        b.classList.toggle("active", on);
-        b.setAttribute("aria-checked", on ? "true" : "false");
-      });
-      refresh();
-    });
-  });
-
-  root.querySelectorAll(".option-card input").forEach(function (input) {
-    input.addEventListener("change", function () {
-      variant = input.value;
-      root.querySelectorAll(".option-card").forEach(function (c) {
-        c.classList.toggle("selected", c.contains(input));
-      });
-      refresh();
-    });
-  });
 
   document.getElementById("qtyDown").addEventListener("click", function () {
     qty = Math.max(1, qty - 1); qtyVal.textContent = qty; refresh();
   });
   document.getElementById("qtyUp").addEventListener("click", function () {
-    qty = Math.min(9, qty + 1); qtyVal.textContent = qty; refresh();
+    qty = Math.min(99, qty + 1); qtyVal.textContent = qty; refresh();
   });
   document.getElementById("pdpAdd").addEventListener("click", function () {
-    addToCart(p.id, variant, qty, pack.key);
+    addToCart(p.id, qty);
     addFeedback(document.getElementById("pdpAdd"));
   });
 
-  refresh();
-  initOfferClock();
+  initAccordions(root);
 
-  // Sticky buy bar: slides up when the main buy row scrolls out of view
+  // Sticky order bar
   var bar = document.createElement("div");
   bar.className = "sticky-buy";
   bar.innerHTML =
     '<div class="sticky-buy-inner">' +
       '<span class="sticky-thumb">' + productImg(p, true) + '</span>' +
-      '<span class="sticky-info"><b>' + esc(p.name) + '</b><em id="stickyMeta"></em></span>' +
-      '<span class="sticky-price" id="stickyPrice"></span>' +
-      '<button class="btn btn-primary sticky-add" id="stickyAdd">Add to cart</button>' +
+      '<span class="sticky-info"><b>' + esc(p.name) + '</b><em id="stickyMeta">' + esc(p.size) + '</em></span>' +
+      '<span class="sticky-price" id="stickyPrice">' + money(p.price) + '</span>' +
+      '<button class="btn btn-primary sticky-add" id="stickyAdd">Add to order</button>' +
     '</div>';
   document.body.appendChild(bar);
 
-  function refreshSticky() {
-    var unit = packPrice(p, pack, variant);
-    document.getElementById("stickyPrice").textContent = money(Math.round(unit * qty * 100) / 100);
-    document.getElementById("stickyMeta").textContent =
-      pack.label + " · " + (variant === "sub" ? "Subscription" : "One-time") + (qty > 1 ? " · ×" + qty : "");
-  }
-  var _refresh = refresh;
-  refresh = function () { _refresh(); refreshSticky(); };
-  refreshSticky();
-
   document.getElementById("stickyAdd").addEventListener("click", function () {
-    addToCart(p.id, variant, qty, pack.key);
+    addToCart(p.id, qty);
     addFeedback(document.getElementById("stickyAdd"));
   });
 
@@ -1015,24 +758,22 @@ function initProduct() {
     barObs.observe(buyRow);
   }
 
-  initAccordions(root);
+  refresh();
 
-  // Pairs well with: same category first, then shared goals
-  var pairs = PRODUCTS.filter(function (o) { return o.id !== p.id && o.category === p.category; });
-  if (pairs.length < 3) {
-    PRODUCTS.forEach(function (o) {
-      if (pairs.length >= 3 || o.id === p.id || pairs.indexOf(o) !== -1) return;
-      if (o.goals.some(function (g) { return p.goals.indexOf(g) !== -1; })) pairs.push(o);
-    });
-  }
-  pairs = pairs.slice(0, 3);
+  // Related: same category first, then anything else
+  var related = PRODUCTS.filter(function (o) { return o.id !== p.id && o.category === p.category; });
+  PRODUCTS.forEach(function (o) {
+    if (related.length >= 3 || o.id === p.id || related.indexOf(o) !== -1) return;
+    related.push(o);
+  });
+  related = related.slice(0, 3);
   var pairsGrid = document.getElementById("pairsGrid");
-  pairsGrid.innerHTML = pairs.map(function (o) { return productCardHTML(o); }).join("");
+  pairsGrid.innerHTML = related.map(function (o) { return productCardHTML(o); }).join("");
   bindCardAdds(pairsGrid);
 }
 
 /* ============================================================
-   Checkout page
+   Checkout
    ============================================================ */
 
 function renderOrderSummary() {
@@ -1040,55 +781,31 @@ function renderOrderSummary() {
   var items = getCart();
 
   if (items.length === 0) {
-    el.innerHTML = '<p class="summary-empty">Your cart is empty.</p><a class="btn btn-secondary" href="shop.html">Back to shop</a>';
+    el.innerHTML = '<p class="summary-empty">Your order is empty.</p><a class="btn btn-secondary" href="shop.html">Back to catalog</a>';
     var btn = document.getElementById("placeOrder");
     if (btn) btn.disabled = true;
     return;
   }
 
   var sub = cartSubtotal();
-  var member = isMember();
-  var discount = member ? Math.round(sub * MEMBER_RATE * 100) / 100 : 0;
-  var goods = sub - discount;
-  var shipping = goods >= FREE_SHIP ? 0 : SHIP_COST;
-  var total = goods + shipping + (member ? MEMBER_FEE : 0);
+  var shipping = sub >= FREE_SHIP ? 0 : SHIP_COST;
+  var total = sub + shipping;
 
   el.innerHTML =
     items.map(function (item) {
       var p = getProductById(item.id);
       return '<div class="summary-line">' +
         '<span class="summary-thumb">' + productImg(p) + '<span class="summary-qty">' + item.qty + '</span></span>' +
-        '<span class="summary-name">' + esc(p.name) + '<em>' + esc(packLabel(item)) + (item.variant === "sub" ? "Subscription" : "One-time") + '</em></span>' +
+        '<span class="summary-name">' + esc(p.name) + '<em>' + esc(p.size) + (p.lot ? " &middot; Lot " + esc(p.lot) : "") + '</em></span>' +
         '<span>' + money(itemPrice(item) * item.qty) + '</span>' +
       '</div>';
     }).join("") +
-    '<label class="member-card' + (member ? " on" : "") + '" id="memberCard">' +
-      '<input type="checkbox" id="memberToggle"' + (member ? " checked" : "") + '>' +
-      '<span class="member-check" aria-hidden="true">' +
-        '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-      '</span>' +
-      '<span class="member-body">' +
-        '<span class="member-title">Nexus Membership <em>' + money(MEMBER_FEE) + '/mo</em></span>' +
-        '<span class="member-desc">20% off every order, member pricing applied below. Cancel anytime.</span>' +
-      '</span>' +
-    '</label>' +
     '<div class="summary-totals">' +
       '<div><span>Subtotal</span><span>' + money(sub) + '</span></div>' +
-      (member ? '<div class="summary-save"><span>Member savings (20%)</span><span>&minus;' + money(discount) + '</span></div>' : "") +
       '<div><span>Shipping</span><span>' + (shipping === 0 ? "Free" : money(shipping)) + '</span></div>' +
-      (shipping !== 0 ? '<p class="summary-note">Add ' + money(Math.round((FREE_SHIP - goods) * 100) / 100) + ' more for free shipping.</p>' : "") +
-      (member ? '<div><span>Nexus Membership</span><span>' + money(MEMBER_FEE) + '/mo</span></div>' : "") +
-      '<div class="summary-grand"><span>Total due today</span><span>' + money(Math.round(total * 100) / 100) + '</span></div>' +
-      (member ? '<p class="summary-note member-note">Includes your first month of membership. Renews at ' + money(MEMBER_FEE) + '/mo, cancel anytime.</p>' : "") +
+      (shipping !== 0 ? '<p class="summary-note">Add ' + money(Math.round((FREE_SHIP - sub) * 100) / 100) + ' more for free shipping.</p>' : "") +
+      '<div class="summary-grand"><span>Total</span><span>' + money(Math.round(total * 100) / 100) + '</span></div>' +
     '</div>';
-
-  var toggle = document.getElementById("memberToggle");
-  if (toggle) {
-    toggle.addEventListener("change", function () {
-      setMember(toggle.checked);
-      renderOrderSummary();
-    });
-  }
 }
 
 function initCheckout() {
@@ -1100,15 +817,17 @@ function initCheckout() {
   btn.addEventListener("click", function () {
     if (getCart().length === 0) return;
     if (!form.checkValidity()) { form.reportValidity(); return; }
+    var ack = document.getElementById("coRuo");
+    if (ack && !ack.checked) { ack.focus(); form.reportValidity(); return; }
     clearCart();
     document.getElementById("checkoutMain").innerHTML =
       '<div class="order-success">' +
         '<div class="success-check" aria-hidden="true">' +
-          '<svg viewBox="0 0 24 24" width="34" height="34"><path d="M4 12.5l5 5L20 6.5" stroke="#0E1526" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '<svg viewBox="0 0 24 24" width="34" height="34"><path d="M4 12.5l5 5L20 6.5" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
         '</div>' +
-        '<h1>Order placed. Welcome to Nexus Health.</h1>' +
-        '<p>A confirmation is on its way to your inbox. Your order ships within 1 business day.</p>' +
-        '<a class="btn btn-primary" href="shop.html">Keep shopping</a>' +
+        '<h1>Order received.</h1>' +
+        '<p>A confirmation with your lot numbers is on its way. In-stock items dispatch within 1 business day, tracked.</p>' +
+        '<a class="btn btn-primary" href="shop.html">Back to catalog</a>' +
       '</div>';
     window.scrollTo({ top: 0 });
   });
@@ -1120,18 +839,17 @@ function initCheckout() {
 
 document.addEventListener("DOMContentLoaded", function () {
   initShell();
+  initGate();
   var page = document.body.getAttribute("data-page");
   if (page === "home") initHome();
   else if (page === "shop") initShop();
   else if (page === "product") initProduct();
   else if (page === "checkout") initCheckout();
-  // Run after the page renderers so dynamically built cards are included
   initReveal();
   initCounters();
   initMotion();
 });
 
-/* Keep the cart badge fresh after bfcache restores and cross-tab changes */
 window.addEventListener("pageshow", function () {
   if (document.getElementById("cartCount")) renderCartUI();
 });
