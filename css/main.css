@@ -2050,3 +2050,25 @@ select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
   .sort-wrap { flex: 1 1 100%; justify-content: space-between; }
   #catalogSort { flex: 1 1 auto; margin-left: 10px; }
 }
+
+/* ============================================================
+   FOOTER SPACING
+   The last section's 128px bottom padding stacked on the footer's
+   64px top padding left ~200px of dead space above the footer.
+   The disclaimer was also capped at 720px inside a 1280px footer,
+   wrapping to 5 lines while half the row sat empty.
+   ============================================================ */
+
+/* Close the gap between the final section and the footer */
+main > section.sec-lux:last-of-type { padding-bottom: clamp(40px, 4vw, 56px); }
+.site-footer .footer-inner { padding-top: clamp(40px, 4vw, 52px); }
+
+/* Let the fine print use the full width instead of wrapping early */
+.footer-fine { margin-top: clamp(32px, 3.5vw, 44px); }
+.footer-fine p { max-width: none; }
+.footer-fine p:first-child { line-height: 1.65; }
+
+/* Keep the legal text a readable measure on very wide screens */
+@media (min-width: 1500px) {
+  .footer-fine p { max-width: 1180px; }
+}
