@@ -2535,25 +2535,75 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
   overflow: hidden;
   isolation: isolate;
 }
+/* The aurora is split into three independently drifting colour clouds so
+   the light in the hero never sits still. Each one moves on its own
+   period, which stops the loop from reading as a loop. */
 .hero-aurora {
   position: absolute; inset: -20% -10% auto -10%; height: 130%; z-index: -2;
-  background:
-    radial-gradient(46% 52% at 18% 8%,  rgba(109,40,255,.60) 0%, transparent 62%),
-    radial-gradient(44% 50% at 78% 22%, rgba(26,4,255,.62)  0%, transparent 64%),
-    radial-gradient(50% 46% at 52% 88%, rgba(20,236,195,.20) 0%, transparent 62%),
-    linear-gradient(160deg, #0A0620 0%, #05060C 58%, #04050A 100%);
-  filter: blur(6px);
+  background: linear-gradient(160deg, #0A0620 0%, #05060C 58%, #04050A 100%);
+  overflow: hidden;   /* the blobs drift wider than this box */
 }
+.hero-aurora .blob {
+  position: absolute; border-radius: 50%;
+  filter: blur(70px); will-change: transform;
+}
+.hero-aurora .blob-1 {
+  width: 62%; height: 74%; left: -6%; top: -22%;
+  background: radial-gradient(circle, rgba(109,40,255,.72) 0%, transparent 68%);
+  animation: drift1 26s ease-in-out infinite;
+}
+.hero-aurora .blob-2 {
+  width: 58%; height: 68%; right: -8%; top: -12%;
+  background: radial-gradient(circle, rgba(26,4,255,.74) 0%, transparent 68%);
+  animation: drift2 34s ease-in-out infinite;
+}
+.hero-aurora .blob-3 {
+  width: 68%; height: 56%; left: 22%; bottom: -24%;
+  background: radial-gradient(circle, rgba(20,236,195,.30) 0%, transparent 68%);
+  animation: drift3 30s ease-in-out infinite;
+}
+@keyframes drift1 {
+  0%,100% { transform: translate3d(0,0,0) scale(1); }
+  33%     { transform: translate3d(14%, 9%, 0) scale(1.16); }
+  66%     { transform: translate3d(-6%, 16%, 0) scale(.92); }
+}
+@keyframes drift2 {
+  0%,100% { transform: translate3d(0,0,0) scale(1); }
+  40%     { transform: translate3d(-16%, 13%, 0) scale(1.2); }
+  75%     { transform: translate3d(5%, -7%, 0) scale(.9); }
+}
+@keyframes drift3 {
+  0%,100% { transform: translate3d(0,0,0) scale(1); }
+  50%     { transform: translate3d(-13%, -11%, 0) scale(1.25); }
+}
+
+/* Follows the cursor. --mx/--my are written by initHeroField() in store.js
+   and default to the centre so it looks right before the first move. */
+.hero-spot {
+  position: absolute; inset: 0; z-index: -2; pointer-events: none;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 46%),
+    rgba(20,236,195,.20) 0%,
+    rgba(109,40,255,.12) 38%,
+    transparent 70%);
+  opacity: 0; transition: opacity .5s ease;
+}
+.hero-tech.is-live .hero-spot { opacity: 1; }
+
 .hero-aurora::after {                      /* fine grain so the gradient isn't flat */
   content: ""; position: absolute; inset: 0; opacity: .35;
   background-image: radial-gradient(rgba(255,255,255,.16) .5px, transparent .5px);
   background-size: 3px 3px;
 }
+/* The grid's mask tracks the cursor too, so the lines light up under it
+   and fall away everywhere else. */
 .hero-tech .hero-grid-bg {
   z-index: -1;
-  mask-image: radial-gradient(ellipse 74% 60% at 26% 42%, #000 22%, transparent 78%);
-  -webkit-mask-image: radial-gradient(ellipse 74% 60% at 26% 42%, #000 22%, transparent 78%);
+  mask-image: radial-gradient(ellipse 74% 60% at var(--gx, 26%) var(--gy, 42%), #000 22%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 74% 60% at var(--gx, 26%) var(--gy, 42%), #000 22%, transparent 78%);
+  transition: opacity .4s ease;
 }
+.hero-tech.is-live .hero-grid-bg { opacity: 1; }
 
 /* the trace itself */
 .hero-chrom {
@@ -2569,20 +2619,34 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
   filter: drop-shadow(0 0 12px rgba(20,236,195,.55));
 }
 @keyframes trace { to { stroke-dashoffset: 0; } }
+
+/* Once it has drawn in, the trace keeps breathing like a live readout
+   instead of freezing into a static graphic. */
+.hero-chrom {
+  transform-origin: bottom center;
+  animation: chromBreathe 9s ease-in-out 3.8s infinite;
+  transition: opacity .45s ease;
+}
+@keyframes chromBreathe {
+  0%, 100% { opacity: .5;  transform: scaleY(1); }
+  50%      { opacity: .68; transform: scaleY(1.055); }
+}
+.hero-tech.is-live .hero-chrom { opacity: .72; }
+
 @media (prefers-reduced-motion: reduce) {
   .hero-chrom path { animation: none; stroke-dashoffset: 0; }
+  .hero-chrom,
+  .hero-aurora .blob { animation: none; }
+  .hero-spot { display: none; }
 }
 
 /* a slim trace used as a section divider */
-/* The trace now divides the light catalog from the band, so it has to
-   actually read. preserveAspectRatio="none" on the SVG lets it span the
-   full width instead of letterboxing to a 320px sliver in the middle. */
-.trace-rule {
-  height: 78px; color: var(--mint); opacity: .5;
-  overflow: hidden; pointer-events: none;
-  background: #05060C;
-}
-.trace-rule svg { width: 100%; height: 78px; display: block; }
+/* (trace-rule divider removed: the catalog now runs straight into the band) */
+
+/* The footer carries a 96px top margin so a light section does not slam
+   into it. When the page already ends on the dark band, that margin is
+   just a black gap, so drop it. */
+body:has(main > .band:last-child) .site-footer { margin-top: 0; }
 
 
 /* ============================================================

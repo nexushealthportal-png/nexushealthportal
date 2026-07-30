@@ -408,6 +408,43 @@ function initShell() {
   renderCartUI();
   initMegaFit();
   initCoa();
+  initHeroField();
+}
+
+/* The hero light follows the pointer. Positions are written as CSS custom
+   properties and read by .hero-spot and .hero-grid-bg, so the paint work
+   stays in the compositor instead of in JS. Updates are throttled to one
+   per frame. No-ops when the hero is absent or motion is reduced. */
+function initHeroField() {
+  var hero = document.querySelector(".hero-tech");
+  if (!hero) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (window.matchMedia && window.matchMedia("(hover: none)").matches) return;
+
+  var pending = null;
+
+  function apply() {
+    pending = null;
+    hero.style.setProperty("--mx", cur.x + "%");
+    hero.style.setProperty("--my", cur.y + "%");
+    // the grid mask lags the spotlight slightly, which reads as depth
+    hero.style.setProperty("--gx", (26 + (cur.x - 50) * 0.45).toFixed(2) + "%");
+    hero.style.setProperty("--gy", (42 + (cur.y - 50) * 0.45).toFixed(2) + "%");
+  }
+
+  var cur = { x: 50, y: 46 };
+
+  hero.addEventListener("pointermove", function (e) {
+    var r = hero.getBoundingClientRect();
+    cur.x = ((e.clientX - r.left) / r.width) * 100;
+    cur.y = ((e.clientY - r.top) / r.height) * 100;
+    hero.classList.add("is-live");
+    if (!pending) pending = requestAnimationFrame(apply);
+  });
+
+  hero.addEventListener("pointerleave", function () {
+    hero.classList.remove("is-live");
+  });
 }
 
 /* ============================================================
