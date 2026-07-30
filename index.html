@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;900&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/main.css?v=1784653000">
+  <link rel="stylesheet" href="css/main.css?v=1784660000">
 </head>
 <body data-page="home">
 
@@ -98,12 +98,12 @@
             </span>
           </a>
 
-          <a class="bento bento-wide" href="index.html#quality">
+          <a class="bento bento-wide" id="quality" href="index.html#faq">
             <img class="bento-img" src="img/card-instrument.webp" alt="HPLC autosampler carousel" loading="lazy">
             <div class="bento-tags"><span class="tag-mint">Quality</span></div>
             <div class="bento-body">
               <h3>Every lot tested before it is listed.</h3>
-              <p>Purity by HPLC&#8209;UV, identity by LC&#8209;MS, and the signed certificate archived for the exact lot you receive.</p>
+              <p>Purity by HPLC&#8209;UV, identity by LC&#8209;MS. A lot that misses spec never ships, and the signed certificate is archived for the exact lot you receive.</p>
             </div>
             <span class="bento-go" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -122,12 +122,12 @@
             </span>
           </a>
 
-          <a class="bento" href="index.html#coa">
+          <a class="bento" id="shipping" href="index.html#faq">
             <img class="bento-img" src="img/card-carousel.webp" alt="Crimp-sealed vials in an analytical instrument" loading="lazy">
-            <div class="bento-tags"><span class="tag-mint">Certificates</span></div>
+            <div class="bento-tags"><span class="tag-mint">Shipping</span></div>
             <div class="bento-body">
-              <h3>Look up<br>any lot.</h3>
-              <p>Search by lot number, product, or CAS.</p>
+              <h3>Sealed.<br>Discreet.</h3>
+              <p>Dispatched in 1 business day, plain tamper-evident packaging, tracked.</p>
             </div>
             <span class="bento-go" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -138,85 +138,18 @@
       </div>
     </section>
 
-    <!-- 4. THREE PROMISES -->
-    <section class="sec-lux tint" id="quality">
-      <div class="container">
-        <div class="sec-head-wrap">
-          <span class="sec-eyebrow">The Nexus standard</span>
-          <h2 class="sec-head">Three promises on every order.</h2>
-        </div>
-        <div class="promise-row">
-          <div class="promise-card">
-            <span class="promise-kicker">Independently tested</span>
-            <h3>Every lot, before listing</h3>
-            <p>Identity is confirmed by LC-MS and purity is determined by HPLC-UV before a lot is listed. If a lot does not meet spec, it does not ship.</p>
-          </div>
-          <div class="promise-card">
-            <span class="promise-kicker">Lot traceable</span>
-            <h3>Certificate on file</h3>
-            <p>Every unit carries the lot number printed on its label, and the signed certificate for that exact lot is available on request.</p>
-          </div>
-          <div class="promise-card">
-            <span class="promise-kicker">Dispatched fast</span>
-            <h3>Sealed and discreet</h3>
-            <p>In-stock items dispatch within 1 business day in plain, tamper-evident packaging, tracked to your facility.</p>
-          </div>
-        </div>
-
-        <div class="method-block">
-          <button class="text-btn" id="testToggle" aria-expanded="false">See our testing method</button>
-          <div class="test-detail" id="testDetail">
-            <p>Each incoming lot is sampled and submitted to an independent analytical laboratory. Identity is established by liquid chromatography with mass spectrometry. Purity is quantified by HPLC with UV detection against a reference standard, and the resulting chromatogram is retained. Peptide lots are additionally checked for water content and residual solvents. A lot is released only when identity is confirmed and purity meets or exceeds the figure published on the product page. The signed report for each released lot is archived and available to purchasers on request.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. COA LOOKUP -->
-    <section class="sec-lux" id="coa">
-      <div class="container">
-        <div class="coa-card">
-          <span class="sec-eyebrow">Certificate lookup</span>
-          <h2 class="sec-head">Find a lot certificate</h2>
-          <p>Search by lot number, product name, or CAS to confirm which certificate covers your material.</p>
-          <form class="coa-form" id="coaForm" novalidate>
-            <input type="text" id="coaInput" placeholder="e.g. NR-2601-A, GHK-Cu, or 89030-95-5" aria-label="Lot number, product name, or CAS">
-            <button class="btn btn-primary" type="submit">Look up</button>
-          </form>
-          <div id="coaResult" aria-live="polite"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5b. SHIPPING & HANDLING -->
-    <section class="sec-lux tint" id="shipping">
-      <div class="container">
-        <div class="sec-head-wrap">
-          <span class="sec-eyebrow">Shipping &amp; handling</span>
-          <h2 class="sec-head">How orders arrive</h2>
-        </div>
-        <div class="spec-row">
-          <div class="spec-card">
-            <span class="spec-num">01</span>
-            <h3>Dispatch</h3>
-            <p>In-stock items ship within 1 business day of a cleared order. Tracking is issued at dispatch.</p>
-          </div>
-          <div class="spec-card">
-            <span class="spec-num">02</span>
-            <h3>Packaging</h3>
-            <p>Plain, unbranded, tamper-evident outer packaging. Nothing on the exterior identifies the contents.</p>
-          </div>
-          <div class="spec-card">
-            <span class="spec-num">03</span>
-            <h3>Condition</h3>
-            <p>Lyophilized solids are shelf-stable and ship ambient. No cold chain required for transit.</p>
-          </div>
-          <div class="spec-card">
-            <span class="spec-num">04</span>
-            <h3>On arrival</h3>
-            <p>Check the lot number against your packing list, then store per the handling notes on each product page.</p>
-          </div>
-        </div>
+    <!-- 4. FULL-BLEED BAND: certificate lookup -->
+    <section class="band" id="coa">
+      <div class="band-glow" aria-hidden="true"></div>
+      <div class="container band-inner">
+        <span class="band-eyebrow">Certificate lookup</span>
+        <h2>Every lot is traceable. Check yours.</h2>
+        <p>Search by lot number, product name, or CAS to confirm which certificate covers your material.</p>
+        <form class="coa-form" id="coaForm" novalidate>
+          <input type="text" id="coaInput" placeholder="e.g. NR-2601-A, GHK-Cu, or 89030-95-5" aria-label="Lot number, product name, or CAS">
+          <button class="btn btn-primary" type="submit">Look up</button>
+        </form>
+        <div id="coaResult" aria-live="polite"></div>
       </div>
     </section>
 
@@ -272,7 +205,7 @@
     </section>
   </main>
 
-  <script src="js/products.js?v=1784653000"></script>
-  <script src="js/store.js?v=1784653000"></script>
+  <script src="js/products.js?v=1784660000"></script>
+  <script src="js/store.js?v=1784660000"></script>
 </body>
 </html>

@@ -2330,3 +2330,124 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
   .nav-about { display: none; }
   .mobile-menu.open { display: flex; }
 }
+
+/* ============================================================
+   FULL-BLEED FOOTER  (replaces the inset card)
+   Flat black, wordmark spanning edge to edge at the top.
+   ============================================================ */
+.site-footer {
+  padding: 0;
+  background: #000;
+  border-top: 1px solid var(--line-soft);
+}
+.site-footer .footer-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(44px, 5vw, 72px) var(--pad) clamp(28px, 3vw, 40px);
+}
+
+/* SVG scales to the row width, so the wordmark always fits exactly */
+.footer-mega {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.site-footer .footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr)) 1.3fr;
+  gap: clamp(26px, 3vw, 44px);
+}
+.site-footer .footer-col h4 {
+  font-family: "Space Mono", monospace;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: rgba(255,255,255,.45);
+  margin-bottom: 16px;
+}
+.site-footer .footer-col a {
+  display: block; margin-bottom: 11px;
+  font-size: 14.5px; color: rgba(255,255,255,.84);
+  transition: color .18s ease;
+}
+.site-footer .footer-col a:hover { color: #fff; }
+.footer-note { font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,.6); }
+.site-footer .footer-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.site-footer .footer-badges span {
+  font-family: "Space Mono", monospace;
+  font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase;
+  border: 1px solid var(--line); border-radius: 4px;
+  padding: 5px 9px; color: rgba(255,255,255,.55);
+}
+
+.site-footer .footer-fine {
+  margin-top: clamp(34px, 4vw, 52px);
+  border-top: 1px solid var(--line-soft);
+  padding-top: 22px;
+}
+.site-footer .footer-fine p {
+  font-size: 11.5px; line-height: 1.65;
+  color: rgba(255,255,255,.42); max-width: none;
+}
+.site-footer .footer-fine strong { color: rgba(255,255,255,.75); letter-spacing: .08em; }
+
+.footer-legal {
+  display: flex; flex-wrap: wrap; gap: 12px 26px;
+  align-items: center; justify-content: space-between;
+  margin-top: 20px; font-size: 12px; color: rgba(255,255,255,.45);
+}
+.footer-legal-links { display: flex; flex-wrap: wrap; gap: 20px; }
+.footer-legal-links a { color: rgba(255,255,255,.45); transition: color .18s ease; }
+.footer-legal-links a:hover { color: #fff; }
+
+/* ============================================================
+   FULL-BLEED GRADIENT BAND
+   ============================================================ */
+.band {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(64px, 8vw, 118px) 0;
+  background: #05060C;
+  isolation: isolate;
+}
+.band-glow {
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    radial-gradient(110% 130% at 50% 0%, rgba(26,4,255,.62) 0%, rgba(26,4,255,.20) 40%, transparent 70%),
+    radial-gradient(80% 90% at 84% 100%, rgba(20,236,195,.16) 0%, transparent 62%),
+    linear-gradient(180deg, #070A18 0%, #04050B 100%);
+}
+.band-glow::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(104deg, transparent 43%, rgba(150,190,255,.30) 50%, transparent 57%);
+  filter: blur(3px);
+}
+.band-inner { text-align: center; position: relative; z-index: 1; }
+.band-eyebrow {
+  display: block;
+  font-family: "Space Mono", monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--mint); margin-bottom: 18px;
+}
+.band-inner h2 {
+  font-weight: 900;
+  font-size: clamp(28px, 4.4vw, 56px);
+  line-height: 1.02; letter-spacing: -.025em;
+  text-transform: uppercase; margin-bottom: 16px;
+}
+.band-inner > p {
+  color: rgba(255,255,255,.7); font-size: 16px;
+  max-width: 520px; margin: 0 auto 32px;
+}
+.band .coa-form { max-width: 620px; margin: 0 auto; }
+.band #coaResult { margin-top: 26px; }
+.band .coa-hit, .band .coa-miss { color: #fff; }
+
+@media (max-width: 900px) {
+  .site-footer .footer-grid { grid-template-columns: 1fr 1fr; }
+  .site-footer .footer-col:last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .footer-legal { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .site-footer .footer-grid { gap: 26px 18px; }
+}
