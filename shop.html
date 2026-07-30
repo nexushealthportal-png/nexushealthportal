@@ -8,11 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;900&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/main.css?v=1784613000">
+  <link rel="stylesheet" href="css/main.css?v=1784621500">
 </head>
 <body data-page="shop">
 
-  <main>
+  <main id="main" tabindex="-1">
     <div class="container shop-head">
       <h1 id="shopTitle">Full catalog</h1>
       <p class="shop-sub" id="shopSub"></p>
@@ -24,13 +24,32 @@
         <button class="chip" data-cat="supplies">Lab supplies</button>
       </div>
 
+      <div class="catalog-toolbar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input type="search" id="catalogSearch" placeholder="Search name, CAS, or formula" aria-label="Search the catalog" autocomplete="off">
+          <button class="search-clear" id="searchClear" type="button" aria-label="Clear search">
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <label class="sort-wrap">
+          <span>Sort</span>
+          <select id="catalogSort" aria-label="Sort products">
+            <option value="default">Featured</option>
+            <option value="name">Name A&ndash;Z</option>
+            <option value="price-asc">Price, low to high</option>
+            <option value="price-desc">Price, high to low</option>
+          </select>
+        </label>
+      </div>
+
       <p class="shop-ruo">All items are supplied for in-vitro laboratory research only. Not for human or veterinary use.</p>
 
       <div class="product-grid lineup-grid" id="productGrid"></div>
     </div>
   </main>
 
-  <script src="js/products.js?v=1784613000"></script>
-  <script src="js/store.js?v=1784613000"></script>
+  <script src="js/products.js?v=1784621500"></script>
+  <script src="js/store.js?v=1784621500"></script>
 </body>
 </html>

@@ -346,10 +346,17 @@ section { padding: 96px 0 0; }
   padding: 22px 4px; font-size: 18px; font-weight: 600; text-align: left; gap: 16px;
 }
 .acc-icon {
-  font-size: 22px; font-weight: 400; color: var(--ink-soft);
-  transition: transform 0.25s ease; line-height: 1;
+  /* Swap the glyph rather than rotating it. A rotated box has a bounding box
+     ~1.41x its width, which was widening the whole accordion row. */
+  font-size: 0; line-height: 1; color: var(--ink-soft);
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 22px; width: 22px; height: 22px;
 }
-.acc-item.open .acc-icon { transform: rotate(45deg); }
+.acc-icon::before {
+  content: "+";
+  font-size: 22px; font-weight: 400; line-height: 1;
+}
+.acc-item.open .acc-icon::before { content: "\2212"; }   /* minus */
 .acc-a {
   max-height: 0; overflow: hidden;
   transition: max-height 0.3s ease, padding 0.3s ease;
@@ -1942,4 +1949,104 @@ body.gate-lock { overflow: hidden; }
 .hero-tech h1, .sec-head, .pdp-title, .faq-head,
 .promise-card h3, .spec-card h3, .lineup-grid .card-name {
   overflow-wrap: break-word;
+}
+
+/* ============================================================
+   FINDABILITY & AFFORDANCE
+   Catalog search + sort, empty state, skip link, focus rings.
+   ============================================================ */
+
+.catalog-toolbar {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  align-items: center; margin: 20px 0 6px;
+}
+
+.search-wrap { position: relative; flex: 1 1 300px; display: flex; align-items: center; }
+.search-icon {
+  position: absolute; left: 15px; color: var(--ink-soft); pointer-events: none;
+}
+#catalogSearch {
+  width: 100%;
+  background: #0B0B0B;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 14px 42px 14px 42px;
+  font: inherit; font-size: 14px;
+  font-family: "Space Mono", monospace;
+  color: var(--ink);
+}
+#catalogSearch::placeholder { color: rgba(255,255,255,.36); }
+#catalogSearch:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: transparent; }
+#catalogSearch::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.search-clear {
+  position: absolute; right: 10px;
+  width: 26px; height: 26px; border-radius: 4px;
+  display: none; align-items: center; justify-content: center;
+  color: var(--ink-soft);
+}
+.search-clear.show { display: flex; }
+.search-clear:hover { color: var(--ink); background: rgba(255,255,255,.08); }
+
+.sort-wrap { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
+.sort-wrap > span {
+  font-family: "Space Mono", monospace;
+  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+#catalogSort {
+  background: #0B0B0B;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 13px 14px;
+  font: inherit; font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+#catalogSort:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+
+/* Empty state: says what happened and how to get back */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: clamp(48px, 9vw, 90px) 24px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+}
+.empty-state h3 {
+  font-weight: 900; font-size: clamp(19px, 3vw, 24px);
+  text-transform: uppercase; letter-spacing: -.01em; margin-bottom: 12px;
+}
+.empty-state p {
+  color: var(--ink-soft); font-size: 14.5px;
+  max-width: 420px; margin: 0 auto 24px;
+}
+
+/* Skip link: first stop for keyboard users */
+.skip-link {
+  position: absolute; left: 50%; top: -60px; transform: translateX(-50%);
+  z-index: 300;
+  background: var(--mint); color: #000;
+  font-weight: 700; font-size: 13px;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 12px 22px; border-radius: 0 0 6px 6px;
+  transition: top .18s ease;
+}
+.skip-link:focus { top: 0; outline: none; }
+main:focus { outline: none; }
+
+/* Visible focus everywhere a keyboard can land */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.card-link:focus-visible { outline-offset: -2px; }
+
+@media (max-width: 600px) {
+  .catalog-toolbar { gap: 10px; }
+  .search-wrap { flex: 1 1 100%; }
+  .sort-wrap { flex: 1 1 100%; justify-content: space-between; }
+  #catalogSort { flex: 1 1 auto; margin-left: 10px; }
 }

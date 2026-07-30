@@ -135,6 +135,7 @@ function clearCart() {
 
 function shellHeaderHTML() {
   return '' +
+  '<a class="skip-link" href="#main">Skip to content</a>' +
   '<div class="announce">' +
     '<div class="announce-inner">' +
       '<span>Research use only &middot; Not for human or veterinary use</span>' +
@@ -565,37 +566,113 @@ function initShop() {
   var title = document.getElementById("shopTitle");
   var sub = document.getElementById("shopSub");
   var chips = document.querySelectorAll("#chipRow .chip");
+  var search = document.getElementById("catalogSearch");
+  var clearBtn = document.getElementById("searchClear");
+  var sortSel = document.getElementById("catalogSort");
 
-  function applyFilter(cat, updateUrl) {
+  var state = { cat: "all", q: "", sort: "default" };
+
+  /* Match on anything a researcher would actually type: product or common
+     name, category, CAS (with or without dashes), or molecular formula. */
+  function matches(p, q) {
+    if (!q) return true;
+    var hay = [p.name, p.subtitle, p.cas, p.formula, p.sequence, CAT_TITLES[p.category]]
+      .filter(Boolean).join(" ").toLowerCase();
+    var bare = hay.replace(/-/g, "");
+    var needle = q.toLowerCase().trim();
+    return hay.indexOf(needle) !== -1 || bare.indexOf(needle.replace(/-/g, "")) !== -1;
+  }
+
+  var SORTS = {
+    "default": null,
+    "price-asc": function (a, b) { return a.price - b.price; },
+    "price-desc": function (a, b) { return b.price - a.price; },
+    "name": function (a, b) { return a.name.localeCompare(b.name); }
+  };
+
+  function render(updateUrl) {
     var list = PRODUCTS.filter(function (p) {
-      return (cat && cat !== "all") ? p.category === cat : true;
+      return (state.cat === "all" || p.category === state.cat) && matches(p, state.q);
     });
+    if (SORTS[state.sort]) list = list.slice().sort(SORTS[state.sort]);
 
-    title.textContent = (cat && cat !== "all") ? CAT_TITLES[cat] : "Full catalog";
-    sub.textContent = list.length + (list.length === 1 ? " product" : " products") +
-      " · every lot tested, certificate on file";
+    title.textContent = state.cat !== "all" ? CAT_TITLES[state.cat] : "Full catalog";
 
-    grid.innerHTML = list.map(function (p) { return productCardHTML(p); }).join("");
-    bindCardAdds(grid);
+    if (list.length) {
+      sub.textContent = list.length + (list.length === 1 ? " product" : " products") +
+        (state.q ? ' matching "' + state.q + '"' : "") +
+        " · every lot tested, certificate on file";
+      grid.innerHTML = list.map(function (p) { return productCardHTML(p); }).join("");
+      bindCardAdds(grid);
+    } else {
+      sub.textContent = "No matches";
+      grid.innerHTML =
+        '<div class="empty-state">' +
+          '<h3>Nothing matched that search.</h3>' +
+          '<p>Try a compound name, a CAS number, or a category. Or clear the filters to see the full catalog.</p>' +
+          '<button class="btn btn-ghost" id="resetFilters">Show all products</button>' +
+        '</div>';
+      var reset = document.getElementById("resetFilters");
+      if (reset) reset.addEventListener("click", function () {
+        state.cat = "all"; state.q = ""; state.sort = "default";
+        if (search) search.value = "";
+        if (sortSel) sortSel.value = "default";
+        render(true);
+      });
+    }
 
     chips.forEach(function (chip) {
-      chip.classList.toggle("active", chip.getAttribute("data-cat") === (cat || "all"));
+      chip.classList.toggle("active", chip.getAttribute("data-cat") === state.cat);
     });
+    if (clearBtn) clearBtn.classList.toggle("show", !!state.q);
 
     if (updateUrl) {
-      history.replaceState(null, "", "shop.html" + (cat && cat !== "all" ? "?cat=" + cat : ""));
+      var parts = [];
+      if (state.cat !== "all") parts.push("cat=" + encodeURIComponent(state.cat));
+      if (state.q) parts.push("q=" + encodeURIComponent(state.q));
+      if (state.sort !== "default") parts.push("sort=" + encodeURIComponent(state.sort));
+      history.replaceState(null, "", "shop.html" + (parts.length ? "?" + parts.join("&") : ""));
     }
   }
 
   chips.forEach(function (chip) {
     chip.addEventListener("click", function () {
-      applyFilter(chip.getAttribute("data-cat"), true);
+      state.cat = chip.getAttribute("data-cat");
+      render(true);
     });
   });
 
+  if (search) {
+    search.addEventListener("input", function () {
+      state.q = search.value;
+      render(true);
+    });
+    // Escape clears the field, which is what people expect from a search box
+    search.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { search.value = ""; state.q = ""; render(true); }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function () {
+      search.value = ""; state.q = ""; search.focus(); render(true);
+    });
+  }
+  if (sortSel) {
+    sortSel.addEventListener("change", function () {
+      state.sort = sortSel.value;
+      render(true);
+    });
+  }
+
+  // Restore state from the URL so filtered views are shareable
   var cat = qs("cat");
-  if (cat && !CAT_TITLES[cat]) cat = null;
-  applyFilter(cat || "all", false);
+  state.cat = (cat && CAT_TITLES[cat]) ? cat : "all";
+  state.q = qs("q") || "";
+  var sort = qs("sort");
+  state.sort = SORTS[sort] ? sort : "default";
+  if (search) search.value = state.q;
+  if (sortSel) sortSel.value = state.sort;
+  render(false);
 }
 
 /* ============================================================
@@ -683,8 +760,8 @@ function initProduct() {
         '<table class="spec-table"><tbody>' + specRows + '</tbody></table>' +
 
         '<div class="acc-group pdp-accs">' +
-          '<div class="acc-item">' +
-            '<button class="acc-q" aria-expanded="false"><span>Description</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
+          '<div class="acc-item open">' +
+            '<button class="acc-q" aria-expanded="true"><span>Description</span><span class="acc-icon" aria-hidden="true">+</span></button>' +
             '<div class="acc-a"><p>' + esc(p.description) + '</p></div>' +
           '</div>' +
           (appItems ? '<div class="acc-item">' +
