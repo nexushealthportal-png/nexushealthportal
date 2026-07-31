@@ -1172,11 +1172,35 @@ main section > .container > h2,
   background: var(--white);
   border: 0;
   box-shadow: none;
-  transition: none;
   display: flex;
   flex-direction: column;
+  /* the card has to be a positioned box so the lifted one can sit above
+     its neighbours instead of being clipped by them */
+  position: relative;
+  z-index: 0;
+  transition: transform .3s cubic-bezier(.2,.7,.3,1),
+              box-shadow .3s cubic-bezier(.2,.7,.3,1);
 }
-.lineup-grid .product-card:hover { transform: none; box-shadow: none; }
+
+/* Pop out on hover. Pointer devices only, so a tap on a phone does not
+   leave a card stuck in the lifted state. */
+@media (hover: hover) and (pointer: fine) {
+  .lineup-grid .product-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 22px 44px rgba(0, 0, 0, .38),
+                0 4px 12px rgba(0, 0, 0, .22);
+    z-index: 3;
+  }
+  /* on the light homepage section the same shadow would read as mud */
+  .sec-light .lineup-grid .product-card:hover {
+    box-shadow: 0 20px 40px rgba(10, 11, 16, .16),
+                0 3px 10px rgba(10, 11, 16, .08);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lineup-grid .product-card { transition: box-shadow .2s ease; }
+  .lineup-grid .product-card:hover { transform: none; }
+}
 
 /* Identical image frame for every product */
 .lineup-grid .card-art {
@@ -1464,6 +1488,12 @@ main section > .container > h2,
     rgba(26, 4, 255, 0.28), rgba(20, 236, 195, 0.05) 45%, transparent 70%);
 }
 .spot:hover::after { opacity: 1; }
+/* At full strength over a white card the glow hazes the product photo, so
+   the card reads faded instead of lifted. Keep a hint of it on paper. */
+.sec-light .spot::after {
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(26, 4, 255, 0.10), rgba(20, 236, 195, 0.03) 45%, transparent 70%);
+}
 
 /* --- Magnetic CTAs --- */
 .hero-lux .btn, .lineup-grid .card-add, .card-add, .pdp-add, .lineup-foot .btn, .sticky-add {
