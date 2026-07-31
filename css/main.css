@@ -2358,7 +2358,9 @@ main > section.sec-lux:last-of-type { padding-bottom: var(--sec-y); }
    ============================================================ */
 .main-nav a, .nav-about { white-space: nowrap; }
 
-@media (max-width: 1020px) {
+/* Raised from 1020px: with Contact in the bar the header overflows below
+   1036px, so the hamburger has to take over before that. */
+@media (max-width: 1080px) {
   .main-nav { display: none; }
   .nav-toggle { display: block; }
   .nav-about { display: none; }

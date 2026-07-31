@@ -23,9 +23,9 @@ const PRODUCTS = [
     storage: "Keep in a freezer at -20 °C, out of the light. Ships at room temperature as a dry powder.",
     solubility: "Dissolves in water and water-based buffers.",
     lot: "NR-2601-A",
-    tagline: "Copper-binding tripeptide used in extracellular matrix and fibroblast studies.",
-    description: "GHK-Cu is the copper(II) complex of the tripeptide glycyl-L-histidyl-L-lysine, used in lab studies of collagen production, skin-cell activity, and how peptides bind metals. Ships as a freeze-dried powder. An outside lab confirmed the compound and measured its purity.",
-    apps: ["Extracellular matrix studies", "Fibroblast culture models", "Metalloprotein chemistry"],
+    tagline: "Copper-binding tripeptide reference compound for in-vitro study.",
+    description: "GHK-Cu is the copper(II) complex of the tripeptide glycyl-L-histidyl-L-lysine, used as a reference compound in in-vitro extracellular matrix and metalloprotein studies. Ships as a freeze-dried powder. An outside lab confirmed the compound and measured its purity.",
+    apps: ["Extracellular matrix studies", "Cell culture models", "Metalloprotein chemistry"],
     price: 48.00,
     img: "nexus-vial"
   },
@@ -67,8 +67,8 @@ const PRODUCTS = [
     storage: "Keep in a fridge at 2 to 8 °C, dry and sealed from air. It reacts with air on exposure to moisture.",
     solubility: "Soluble in water, approx. 100 mg/mL.",
     lot: "NR-2601-C",
-    tagline: "Reference thiol antioxidant for redox and oxidative stress assays.",
-    description: "Reduced glutathione is the principal intracellular thiol antioxidant and a standard reagent in redox biology. Used to prepare standard curves for GSH/GSSG assays, as a reducing agent in buffers, and as a substrate in glutathione S-transferase work.",
+    tagline: "Reference thiol compound for redox assays.",
+    description: "Reduced glutathione is the principal intracellular thiol and a standard reference reagent in redox chemistry. Used to prepare standard curves for GSH/GSSG assays, as a reducing agent in buffers, and as a substrate in glutathione S-transferase work.",
     apps: ["GSH/GSSG ratio assays", "Redox buffer preparation", "Glutathione S-transferase substrate"],
     price: 34.00,
     img: "nexus-vial"

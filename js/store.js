@@ -225,7 +225,8 @@ var NAV_LINKS =
   '<a href="quality.html">Quality</a>' +
   '<a href="certificates.html">Certificates</a>' +
   '<a href="shipping.html">Shipping</a>' +
-  '<a href="wholesale.html">Wholesale</a>';
+  '<a href="wholesale.html">Wholesale</a>' +
+  '<a href="contact.html">Contact</a>';
 
 function shellHeaderHTML() {
   return '' +
@@ -302,7 +303,7 @@ function shellFooterHTML() {
       '</div>' +
 
       '<div class="footer-fine">' +
-        '<p class="ruo-verbatim ruo-verbatim--footer">' + RUO_VERBATIM + '</p>' +
+        '<p class="ruo-verbatim ruo-verbatim--footer">Research Use Only. ' + RUO_VERBATIM + '</p>' +
         '<p><strong>DISCLAIMER</strong> &mdash; All products sold by Nexus Research are intended for ' +
         'laboratory research use only. They are not for human or animal consumption of any kind, and are ' +
         'not drugs, foods, cosmetics, or dietary supplements. Nothing on this site constitutes medical advice ' +
@@ -900,7 +901,15 @@ function initProduct() {
     return;
   }
 
-  document.title = p.name + " | Nexus Research";
+  /* Dynamic Search Ads generate their headline from this page, so the title
+     carries the terms a researcher searches with and no benefit language. */
+  document.title = p.name + ", research grade " + p.size + " | Nexus Research";
+  var metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) {
+    metaDesc.setAttribute("content",
+      p.name + (p.cas ? ", CAS " + p.cas : "") + ", " + p.size + ", " + p.purity +
+      " by HPLC. Batch tested with a report on file. " + RUO_VERBATIM);
+  }
 
   var specRows = [
     ["Catalog number", p.lot],
@@ -932,7 +941,7 @@ function initProduct() {
       '<div class="pdp-left">' +
         '<div class="pdp-art">' + productImg(p, true) + '</div>' +
         '<div class="pdp-chips">' +
-          '<span class="pill-chip">Research use only</span>' +
+          '<span class="pill-chip">Research Use Only</span>' +
           '<span class="pill-chip">Lot ' + esc(p.lot) + '</span>' +
           '<span class="pill-chip">COA on file</span>' +
         '</div>' +
@@ -944,7 +953,7 @@ function initProduct() {
 
         '<div class="ruo-flag">' +
           '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l9 16H3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9v5M12 16.5v.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
-          '<span><strong>' + RUO_VERBATIM + '</strong> Not a drug, food, cosmetic, or supplement.</span>' +
+          '<span><strong>Research Use Only. ' + RUO_VERBATIM + '</strong> Not a drug, food, cosmetic, or supplement.</span>' +
         '</div>' +
 
         '<div class="pdp-buy-block">' +
