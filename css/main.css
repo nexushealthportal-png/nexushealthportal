@@ -1638,11 +1638,13 @@ body.gate-lock { overflow: hidden; }
   mask-image: radial-gradient(ellipse 80% 60% at 30% 40%, #000 25%, transparent 75%);
   -webkit-mask-image: radial-gradient(ellipse 80% 60% at 30% 40%, #000 25%, transparent 75%);
 }
-.hero-tech-inner { position: relative; max-width: 880px; }
+/* Widened for the longer headline so "PREMIUM RESEARCH GRADE" holds one
+   line instead of breaking into five. */
+.hero-tech-inner { position: relative; max-width: 1060px; }
 .hero-tech .hero-eyebrow { display: block; color: var(--mint); margin-bottom: 22px; }
 .hero-tech h1 {
   font-weight: 900;
-  font-size: clamp(30px, 9vw, 88px);
+  font-size: clamp(29px, 5.4vw, 66px);   /* 67px is the largest that keeps line 1 unbroken */
   line-height: 0.94;
   letter-spacing: -0.03em;
   text-transform: uppercase;
