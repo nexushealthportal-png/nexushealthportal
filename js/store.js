@@ -284,6 +284,7 @@ function shellFooterHTML() {
           '<a href="shop.html">All products</a>' +
           '<a href="shop.html?cat=peptides">Peptides</a>' +
           '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
+          '<a href="shop.html?cat=capsules">Capsules</a>' +
           '<a href="shop.html?cat=supplies">Lab supplies</a></div>' +
         '<div class="footer-col"><h4>Company</h4>' +
           '<a href="about.html">About Nexus</a>' +
@@ -766,6 +767,7 @@ function initAccordions(root) {
 var CAT_TITLES = {
   peptides: "Peptides",
   biochemicals: "Biochemicals",
+  capsules: "Capsules",
   supplies: "Lab supplies"
 };
 
@@ -1001,6 +1003,8 @@ function initProduct() {
             '</span>' +
             '<button class="btn btn-primary pdp-add" id="pdpAdd">Add to order &middot; <span id="pdpAddPrice">' + money(p.price) + '</span></button>' +
           '</div>' +
+          (p.box ? '<p class="pdp-bulk">Box of 10: <strong>' + money(p.box) +
+            '</strong> <a href="wholesale.html">Ask the wholesale desk &rarr;</a></p>' : "") +
           '<div class="pdp-perks">' +
             '<div class="perk"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 3v4h4M10 12h5M10 16h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Test report for batch ' + esc(p.lot) + ', on request</span></div>' +
             '<div class="perk"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M3 7.2l9-4 9 4v9.6l-9 4-9-4V7.2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span>Ships in 1 business day, plain tamper-evident packaging</span></div>' +

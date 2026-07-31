@@ -3168,3 +3168,13 @@ main > .container:last-child { padding-bottom: clamp(56px, 6vw, 88px); }
   .buy-mode-price { font-size: 14px; flex-direction: column; align-items: flex-end; gap: 1px; }
   .buy-mode-title { font-size: 13px; }
 }
+
+/* bulk price line on the product page */
+.pdp-bulk {
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 13px; color: var(--ink-soft);
+}
+.pdp-bulk strong { color: #fff; font-weight: 700; }
+.pdp-bulk a { color: var(--mint); margin-left: 6px; }
+.sec-light .pdp-bulk strong { color: var(--paper-ink); }
