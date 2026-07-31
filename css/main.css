@@ -3037,3 +3037,132 @@ main > .container:last-child { padding-bottom: clamp(56px, 6vw, 88px); }
     line-height: 1.35;
   }
 }
+
+/* ============================================================
+   SUBSCRIBE AND SAVE
+   Buy-once vs repeating schedule, on the product page, in the cart,
+   and in the checkout summary.
+   ============================================================ */
+
+.buy-modes { display: grid; gap: 8px; margin: 18px 0 16px; }
+
+.buy-mode {
+  display: flex; align-items: center; gap: 13px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+.buy-mode:hover { border-color: rgba(255, 255, 255, .38); }
+.buy-mode input { position: absolute; opacity: 0; pointer-events: none; }
+
+.buy-mode-dot {
+  flex: 0 0 auto; width: 17px; height: 17px; border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, .42);
+  position: relative; transition: border-color .18s ease;
+}
+.buy-mode.is-on { border-color: var(--mint); background: rgba(20, 236, 195, .06); }
+.buy-mode.is-on .buy-mode-dot { border-color: var(--mint); }
+.buy-mode.is-on .buy-mode-dot::after {
+  content: ""; position: absolute; inset: 3px;
+  border-radius: 50%; background: var(--mint);
+}
+
+.buy-mode-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1 1 auto; }
+.buy-mode-title {
+  font-weight: 700; font-size: 14px; letter-spacing: -.005em;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.buy-mode-title em {
+  font-style: normal; font-family: "Space Mono", monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: #04140F; background: var(--mint); padding: 3px 7px;
+}
+.buy-mode-note { font-size: 12px; color: var(--ink-soft); line-height: 1.4; }
+.buy-mode-price {
+  flex: 0 0 auto; font-weight: 700; font-size: 15px;
+  display: flex; align-items: baseline; gap: 7px;
+}
+.buy-mode-price s { color: var(--ink-soft); font-weight: 400; font-size: 12.5px; }
+
+.sub-interval { display: flex; align-items: center; gap: 10px; padding: 2px 2px 0; }
+.sub-interval label {
+  font-family: "Space Mono", monospace; font-size: 10.5px;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft);
+}
+.sub-interval select {
+  flex: 1 1 auto;
+  background: transparent; color: inherit;
+  border: 1px solid var(--line);
+  padding: 10px 12px; font: inherit; font-size: 13px;
+  border-radius: 0;
+}
+
+/* light-section variants */
+.sec-light .buy-mode { border-color: rgba(10, 11, 16, .18); }
+.sec-light .buy-mode-note { color: var(--paper-soft); }
+.sec-light .buy-mode-dot { border-color: rgba(10, 11, 16, .34); }
+.sec-light .sub-interval select { border-color: rgba(10, 11, 16, .18); }
+
+/* --- cart drawer --- */
+.drawer-sub {
+  margin-top: 6px;
+  background: transparent; color: inherit;
+  border: 1px solid var(--line);
+  font: inherit; font-size: 11.5px;
+  padding: 5px 8px; border-radius: 0; max-width: 100%;
+}
+.drawer-save,
+.summary-save {
+  display: flex; justify-content: space-between;
+  font-size: 13px; color: var(--mint); font-weight: 600;
+  padding: 2px 0;
+}
+.summary-sub {
+  display: block; color: var(--mint);
+  font-family: "Space Mono", monospace; font-size: 10.5px;
+  letter-spacing: .1em; text-transform: uppercase; font-style: normal;
+}
+
+/* --- subscription terms, shown before the order is placed --- */
+.sub-terms {
+  margin-top: 20px; padding: 18px;
+  border: 1px solid var(--line);
+}
+.sub-terms h3 {
+  font-weight: 900; font-size: 13px; letter-spacing: .04em;
+  text-transform: uppercase; margin-bottom: 12px;
+}
+.sub-terms ul { list-style: none; margin: 0 0 12px; padding: 0; }
+.sub-terms li {
+  font-size: 12.5px; line-height: 1.55; color: var(--ink-soft);
+  padding: 5px 0; border-bottom: 1px dotted rgba(255, 255, 255, .14);
+}
+.sub-terms li:last-child { border-bottom: 0; }
+.sub-terms p { font-size: 12px; line-height: 1.6; color: var(--ink-soft); }
+.sub-terms p + p { margin-top: 9px; }
+.sub-terms a { color: var(--mint); }
+
+/* --- the verbatim compliance line, wherever it appears --- */
+/* Rendered exactly as written: no text-transform, because the exact
+   sentence is what has to appear. */
+.ruo-verbatim {
+  font-family: "Space Mono", monospace;
+  font-size: 11px; line-height: 1.55; letter-spacing: .02em;
+  text-transform: none; color: var(--ink-soft);
+  margin: 14px 0;
+}
+.ruo-verbatim--footer {
+  color: #fff; font-weight: 700; letter-spacing: .02em;
+  font-size: 12px; margin: 0 0 14px;
+}
+/* the announce bar carries the same sentence, also untransformed */
+.announce-inner span { text-transform: none; letter-spacing: .01em; }
+.sec-light .ruo-verbatim { color: var(--paper-soft); }
+
+@media (max-width: 520px) {
+  .buy-mode { padding: 12px 13px; gap: 10px; }
+  .buy-mode-price { font-size: 14px; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .buy-mode-title { font-size: 13px; }
+}

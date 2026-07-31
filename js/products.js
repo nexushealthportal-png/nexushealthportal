@@ -133,9 +133,9 @@ const PRODUCTS = [
     storage: "Store at room temperature. Do not freeze.",
     solubility: "Miscible, used as a diluent.",
     lot: "NR-2601-F",
-    tagline: "Multi-dose liquid for mixing with freeze-dried powders.",
-    description: "Sterile water containing 0.9% benzyl alcohol as a bacteriostatic agent, allowing a sealed vial to be entered multiple times during a work session. The standard lab liquid for mixing freeze-dried powders back into solution.",
-    apps: ["Mixing freeze-dried powders", "Multi-dose stock preparation", "General laboratory diluent"],
+    tagline: "Sterile bacteriostatic diluent, 0.9% benzyl alcohol.",
+    description: "Sterile water containing 0.9% benzyl alcohol as a bacteriostatic agent. A standard laboratory diluent supplied as a sealed vial. No preparation or usage guidance is provided with this product.",
+    apps: ["General laboratory diluent"],
     price: 12.00,
     img: "nexus-vial"
   },
@@ -156,8 +156,8 @@ const PRODUCTS = [
     solubility: null,
     lot: "NR-2601-G",
     tagline: "Type I borosilicate vials with tamper-evident aluminium seals.",
-    description: "Depyrogenated Type I borosilicate vials with butyl rubber stoppers and aluminium crimp seals. For storing mixed solutions and splitting dry powder into smaller portions under sterile technique.",
-    apps: ["Splitting into portions", "Dry powder storage", "Sterile sample handling"],
+    description: "Depyrogenated Type I borosilicate vials with butyl rubber stoppers and aluminium crimp seals. Empty laboratory glassware, supplied sterile.",
+    apps: ["Laboratory sample storage", "Sterile sample handling"],
     price: 26.00,
     img: "nexus-vial"
   },
@@ -178,8 +178,8 @@ const PRODUCTS = [
     solubility: null,
     lot: "NR-2601-H",
     tagline: "Sterilizing-grade filtration for aqueous solutions.",
-    description: "Sterilizing-grade 0.22 µm polyethersulfone syringe filters with low protein binding and luer-lock fittings. Used to sterile-filter mixed water-based solutions and buffers before use in culture.",
-    apps: ["Sterile filtration of stocks", "Buffer clarification", "Culture media preparation"],
+    description: "Sterilizing-grade 0.22 µm polyethersulfone syringe filters with low protein binding and luer-lock fittings. Laboratory consumable, supplied sterile.",
+    apps: ["Laboratory filtration", "Buffer clarification"],
     price: 34.00,
     img: "nexus-vial"
   }

@@ -2,10 +2,11 @@
    Shared shell (header, footer, cart drawer), RUO access gate, cart logic,
    and per-page renderers. Pages declare themselves via <body data-page="...">.
 
-   RESEARCH USE ONLY storefront. Deliberately contains no consumer-conversion
-   machinery: no subscriptions, no urgency timers, no volume-discount ladders,
-   no testimonials, no outcome claims. Product pages carry identity and
-   handling data only.
+   RESEARCH USE ONLY storefront. Products can be bought once or on a
+   repeating schedule (subscribe and save). Deliberately contains no other
+   consumer-conversion machinery: no urgency timers, no volume-discount
+   ladders, no testimonials, no outcome claims. Product pages carry
+   identity and handling data only.
 */
 
 /* ============================================================
@@ -78,10 +79,54 @@ var CART_KEY = "nr_cart";
 var FREE_SHIP = 150;
 var SHIP_COST = 12.00;
 
+/* The compliance line, used verbatim and unchanged in the header, footer,
+   product page, cart, and checkout. Do not reword it: the exact sentence
+   is the point. */
+var RUO_VERBATIM = "For laboratory research use only. Not for human consumption.";
+
+/* Subscription terms, stated in full before the order is placed: what
+   recurs, how often, at what price, and how to stop it. */
+function subTermsHTML() {
+  var lines = getCart().filter(function (i) { return i.sub; }).map(function (i) {
+    var p = getProductById(i.id);
+    return '<li>' + esc(p.name) + ' &times;' + i.qty + ' &mdash; ' +
+      money(round2(itemPrice(i) * i.qty)) + ', ' + subLabel(i.sub).toLowerCase() + '</li>';
+  }).join("");
+  return '<div class="sub-terms">' +
+    '<h3>Your subscription</h3>' +
+    '<ul>' + lines + '</ul>' +
+    '<p>These items repeat automatically at the price shown, ' + subPct() +
+    '% below the one-time price, until you cancel. The first delivery is charged today ' +
+    'and each repeat is charged on the day it ships. We email you before every ' +
+    'charge.</p>' +
+    '<p>Cancel or change the schedule any time by emailing ' +
+    '<a href="mailto:support@nexushealthportal.com">support@nexushealthportal.com</a>. ' +
+    'There is no cancellation fee and no minimum number of deliveries.</p>' +
+  '</div>';
+}
+
+/* Subscribe and save. Every product can be bought once or on a repeating
+   schedule; the schedule takes SUB_DISCOUNT off every delivery, including
+   the first. Change the one number to change the offer everywhere. */
+var SUB_DISCOUNT = 0.15;
+var SUB_DEFAULT_DAYS = 30;
+var SUB_INTERVALS = [30, 60, 90];
+
+function subLabel(days) { return "Every " + days + " days"; }
+function round2(n) { return Math.round(n * 100) / 100; }
+function subPrice(price) { return round2(price * (1 - SUB_DISCOUNT)); }
+function subPct() { return Math.round(SUB_DISCOUNT * 100); }
+
 function getCart() {
   try {
     var raw = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
-    return Array.isArray(raw) ? raw.filter(function (i) { return getProductById(i.id); }) : [];
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(function (i) { return getProductById(i.id); })
+      .map(function (i) {
+        // carts saved before subscriptions existed have no `sub` field
+        i.sub = SUB_INTERVALS.indexOf(i.sub) === -1 ? null : i.sub;
+        return i;
+      });
   } catch (e) { return []; }
 }
 
@@ -90,8 +135,26 @@ function saveCart(items) {
   renderCartUI();
 }
 
+/* Unit price for one of this line, with the subscription discount applied
+   when the line is on a schedule. */
 function itemPrice(item) {
+  var p = getProductById(item.id);
+  return item.sub ? subPrice(p.price) : p.price;
+}
+
+/* What the same line would cost bought once, so the cart can show savings. */
+function itemListPrice(item) {
   return getProductById(item.id).price;
+}
+
+function cartSavings() {
+  return round2(getCart().reduce(function (n, i) {
+    return n + (itemListPrice(i) - itemPrice(i)) * i.qty;
+  }, 0));
+}
+
+function hasSubscription() {
+  return getCart().some(function (i) { return !!i.sub; });
 }
 
 function cartCount() {
@@ -102,13 +165,29 @@ function cartSubtotal() {
   return getCart().reduce(function (n, i) { return n + itemPrice(i) * i.qty; }, 0);
 }
 
-function addToCart(id, qty) {
+/* A one-time buy and a subscription of the same product are separate lines,
+   so they are matched on both id and schedule. */
+function addToCart(id, qty, sub) {
+  sub = SUB_INTERVALS.indexOf(sub) === -1 ? null : sub;
   var items = getCart();
-  var found = items.find(function (i) { return i.id === id; });
+  var found = items.find(function (i) { return i.id === id && i.sub === sub; });
   if (found) found.qty += qty;
-  else items.push({ id: id, qty: qty });
+  else items.push({ id: id, qty: qty, sub: sub });
   saveCart(items);
   openDrawer();
+}
+
+/* Switch an existing line between one-time and a schedule, merging it into
+   a matching line if one already exists. */
+function setLineSub(index, sub) {
+  sub = SUB_INTERVALS.indexOf(sub) === -1 ? null : sub;
+  var items = getCart();
+  var line = items[index];
+  if (!line || line.sub === sub) return;
+  var twin = items.find(function (i, n) { return n !== index && i.id === line.id && i.sub === sub; });
+  if (twin) { twin.qty += line.qty; items.splice(index, 1); }
+  else line.sub = sub;
+  saveCart(items);
 }
 
 function changeQty(index, delta) {
@@ -153,7 +232,7 @@ function shellHeaderHTML() {
   '<a class="skip-link" href="#main">Skip to content</a>' +
   '<div class="announce">' +
     '<div class="announce-inner">' +
-      '<span>Research use only &middot; Not for human or veterinary use</span>' +
+      '<span>' + RUO_VERBATIM + '</span>' +
     '</div>' +
   '</div>' +
   '<header class="site-header">' +
@@ -223,6 +302,7 @@ function shellFooterHTML() {
       '</div>' +
 
       '<div class="footer-fine">' +
+        '<p class="ruo-verbatim ruo-verbatim--footer">' + RUO_VERBATIM + '</p>' +
         '<p><strong>DISCLAIMER</strong> &mdash; All products sold by Nexus Research are intended for ' +
         'laboratory research use only. They are not for human or animal consumption of any kind, and are ' +
         'not drugs, foods, cosmetics, or dietary supplements. Nothing on this site constitutes medical advice ' +
@@ -278,6 +358,13 @@ function renderCartUI() {
       '<div class="drawer-item-info">' +
         '<a class="drawer-item-name" href="product.html?id=' + esc(p.id) + '">' + esc(p.name) + '</a>' +
         '<span class="drawer-item-variant">' + esc(p.size) + (p.purity ? " &middot; " + esc(p.purity) : "") + '</span>' +
+        '<select class="drawer-sub" data-sub="' + idx + '" aria-label="Delivery schedule for ' + esc(p.name) + '">' +
+          '<option value="once"' + (item.sub ? "" : " selected") + '>Buy once</option>' +
+          SUB_INTERVALS.map(function (d) {
+            return '<option value="' + d + '"' + (item.sub === d ? " selected" : "") + '>' +
+              subLabel(d) + ' &middot; save ' + subPct() + '%</option>';
+          }).join("") +
+        '</select>' +
         '<div class="drawer-item-row">' +
           '<span class="qty-stepper">' +
             '<button data-qty="-1" data-idx="' + idx + '" aria-label="Decrease quantity">&minus;</button>' +
@@ -292,6 +379,7 @@ function renderCartUI() {
   }).join("");
 
   var sub = cartSubtotal();
+  var save = cartSavings();
   var away = FREE_SHIP - sub;
   var pct = Math.min(100, (sub / FREE_SHIP) * 100);
   var shipMsg = away > 0
@@ -303,7 +391,9 @@ function renderCartUI() {
       '<span class="ship-msg' + (away <= 0 ? " unlocked" : "") + '">' + shipMsg + '</span>' +
       '<div class="progress-track"><div class="progress-bar" style="width:' + pct + '%"></div></div>' +
     '</div>' +
-    '<div class="drawer-subtotal"><span>Subtotal</span><span>' + money(sub) + '</span></div>' +
+    (save > 0 ? '<div class="drawer-save"><span>Subscription saving</span><span>&minus;' + money(save) + '</span></div>' : "") +
+    '<div class="drawer-subtotal"><span>Subtotal</span><span>' + money(round2(sub)) + '</span></div>' +
+    '<p class="ruo-verbatim">' + RUO_VERBATIM + '</p>' +
     '<a class="btn btn-primary drawer-checkout" href="checkout.html">Checkout</a>';
 
   itemsEl.querySelectorAll("[data-qty]").forEach(function (btn) {
@@ -314,6 +404,12 @@ function renderCartUI() {
   itemsEl.querySelectorAll("[data-remove]").forEach(function (btn) {
     btn.addEventListener("click", function () {
       removeItem(parseInt(btn.getAttribute("data-remove"), 10));
+    });
+  });
+  itemsEl.querySelectorAll("[data-sub]").forEach(function (sel) {
+    sel.addEventListener("change", function () {
+      var v = sel.value;
+      setLineSub(parseInt(sel.getAttribute("data-sub"), 10), v === "once" ? null : parseInt(v, 10));
     });
   });
 }
@@ -848,11 +944,46 @@ function initProduct() {
 
         '<div class="ruo-flag">' +
           '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l9 16H3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9v5M12 16.5v.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
-          '<span>For lab research only. Not a drug, food, cosmetic, or supplement. Not for human or veterinary use.</span>' +
+          '<span><strong>' + RUO_VERBATIM + '</strong> Not a drug, food, cosmetic, or supplement.</span>' +
         '</div>' +
 
         '<div class="pdp-buy-block">' +
-          '<div class="pdp-buy-price"><strong>' + money(p.price) + '</strong><span>' + esc(p.size) + '</span></div>' +
+          '<div class="pdp-buy-price"><strong id="pdpUnit">' + money(p.price) + '</strong><span>' + esc(p.size) + '</span></div>' +
+
+          /* One-time is the default. Nothing is pre-selected on the
+             customer's behalf beyond the plain single purchase. */
+          '<div class="buy-modes" role="radiogroup" aria-label="Purchase option">' +
+            '<label class="buy-mode is-on" data-mode="once">' +
+              '<input type="radio" name="buyMode" value="once" checked>' +
+              '<span class="buy-mode-dot" aria-hidden="true"></span>' +
+              '<span class="buy-mode-text">' +
+                '<span class="buy-mode-title">Buy once</span>' +
+                '<span class="buy-mode-note">Single delivery</span>' +
+              '</span>' +
+              '<span class="buy-mode-price">' + money(p.price) + '</span>' +
+            '</label>' +
+            '<label class="buy-mode" data-mode="sub">' +
+              '<input type="radio" name="buyMode" value="sub">' +
+              '<span class="buy-mode-dot" aria-hidden="true"></span>' +
+              '<span class="buy-mode-text">' +
+                '<span class="buy-mode-title">Subscribe <em>save ' + subPct() + '%</em></span>' +
+                '<span class="buy-mode-note">Repeats until you cancel. Cancel any time.</span>' +
+              '</span>' +
+              '<span class="buy-mode-price">' +
+                '<s>' + money(p.price) + '</s>' + money(subPrice(p.price)) +
+              '</span>' +
+            '</label>' +
+            '<div class="sub-interval" id="subInterval" hidden>' +
+              '<label for="subDays">Deliver</label>' +
+              '<select id="subDays">' +
+                SUB_INTERVALS.map(function (d) {
+                  return '<option value="' + d + '"' + (d === SUB_DEFAULT_DAYS ? " selected" : "") + '>' +
+                    subLabel(d) + '</option>';
+                }).join("") +
+              '</select>' +
+            '</div>' +
+          '</div>' +
+
           '<div class="pdp-buy-row">' +
             '<span class="qty-stepper qty-lg">' +
               '<button id="qtyDown" aria-label="Decrease quantity">&minus;</button>' +
@@ -898,15 +1029,39 @@ function initProduct() {
 
   var qty = 1;
   var qtyVal = document.getElementById("qtyVal");
+  var mode = "once";                       // "once" | "sub"
+  var subDays = SUB_DEFAULT_DAYS;
+
+  function unitPrice() { return mode === "sub" ? subPrice(p.price) : p.price; }
+  function chosenSub() { return mode === "sub" ? subDays : null; }
 
   function refresh() {
-    document.getElementById("pdpAddPrice").textContent = money(Math.round(p.price * qty * 100) / 100);
+    var line = round2(unitPrice() * qty);
+    document.getElementById("pdpAddPrice").textContent = money(line);
+    document.getElementById("pdpUnit").textContent = money(unitPrice());
     var sp = document.getElementById("stickyPrice");
     if (sp) {
-      sp.textContent = money(Math.round(p.price * qty * 100) / 100);
-      document.getElementById("stickyMeta").textContent = p.size + (qty > 1 ? " · ×" + qty : "");
+      sp.textContent = money(line);
+      document.getElementById("stickyMeta").textContent =
+        p.size + (qty > 1 ? " · ×" + qty : "") + (mode === "sub" ? " · " + subLabel(subDays).toLowerCase() : "");
     }
   }
+
+  var modeEls = root.querySelectorAll(".buy-mode");
+  var intervalEl = document.getElementById("subInterval");
+  modeEls.forEach(function (el) {
+    el.addEventListener("click", function () {
+      mode = el.getAttribute("data-mode");
+      modeEls.forEach(function (o) { o.classList.toggle("is-on", o === el); });
+      el.querySelector("input").checked = true;
+      intervalEl.hidden = mode !== "sub";
+      refresh();
+    });
+  });
+  document.getElementById("subDays").addEventListener("change", function (e) {
+    subDays = parseInt(e.target.value, 10);
+    refresh();
+  });
 
   document.getElementById("qtyDown").addEventListener("click", function () {
     qty = Math.max(1, qty - 1); qtyVal.textContent = qty; refresh();
@@ -915,7 +1070,7 @@ function initProduct() {
     qty = Math.min(99, qty + 1); qtyVal.textContent = qty; refresh();
   });
   document.getElementById("pdpAdd").addEventListener("click", function () {
-    addToCart(p.id, qty);
+    addToCart(p.id, qty, chosenSub());
     addFeedback(document.getElementById("pdpAdd"));
   });
 
@@ -934,7 +1089,7 @@ function initProduct() {
   document.body.appendChild(bar);
 
   document.getElementById("stickyAdd").addEventListener("click", function () {
-    addToCart(p.id, qty);
+    addToCart(p.id, qty, chosenSub());
     addFeedback(document.getElementById("stickyAdd"));
   });
 
@@ -984,16 +1139,20 @@ function renderOrderSummary() {
       var p = getProductById(item.id);
       return '<div class="summary-line">' +
         '<span class="summary-thumb">' + productImg(p) + '<span class="summary-qty">' + item.qty + '</span></span>' +
-        '<span class="summary-name">' + esc(p.name) + '<em>' + esc(p.size) + (p.lot ? " &middot; Lot " + esc(p.lot) : "") + '</em></span>' +
+        '<span class="summary-name">' + esc(p.name) + '<em>' + esc(p.size) + (p.lot ? " &middot; Batch " + esc(p.lot) : "") + '</em>' +
+          (item.sub ? '<em class="summary-sub">' + subLabel(item.sub) + ' &middot; save ' + subPct() + '%</em>' : "") + '</span>' +
         '<span>' + money(itemPrice(item) * item.qty) + '</span>' +
       '</div>';
     }).join("") +
     '<div class="summary-totals">' +
-      '<div><span>Subtotal</span><span>' + money(sub) + '</span></div>' +
+      '<div><span>Subtotal</span><span>' + money(round2(sub)) + '</span></div>' +
+      (cartSavings() > 0 ? '<div class="summary-save"><span>Subscription saving</span><span>&minus;' + money(cartSavings()) + '</span></div>' : "") +
       '<div><span>Shipping</span><span>' + (shipping === 0 ? "Free" : money(shipping)) + '</span></div>' +
       (shipping !== 0 ? '<p class="summary-note">Add ' + money(Math.round((FREE_SHIP - sub) * 100) / 100) + ' more for free shipping.</p>' : "") +
-      '<div class="summary-grand"><span>Total</span><span>' + money(Math.round(total * 100) / 100) + '</span></div>' +
-    '</div>';
+      '<div class="summary-grand"><span>Total due today</span><span>' + money(round2(total)) + '</span></div>' +
+    '</div>' +
+    (hasSubscription() ? subTermsHTML() : "") +
+    '<p class="ruo-verbatim">' + RUO_VERBATIM + '</p>';
 }
 
 function initCheckout() {
