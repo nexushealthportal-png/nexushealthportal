@@ -133,6 +133,21 @@ function clearCart() {
    Shared shell
    ============================================================ */
 
+/* One source for the nav. The desktop bar and the mobile menu had drifted
+   into different lists, so Certificates, Shipping and Wholesale were only
+   reachable from the footer on a laptop. Building both from this string
+   means they cannot diverge again.
+
+   The three category links moved out: shop.html already filters by
+   category with its own chips, and dropping them keeps the bar short
+   enough to fit above the 1020px collapse point. */
+var NAV_LINKS =
+  '<a href="shop.html">Catalog</a>' +
+  '<a href="quality.html">Quality</a>' +
+  '<a href="certificates.html">Certificates</a>' +
+  '<a href="shipping.html">Shipping</a>' +
+  '<a href="wholesale.html">Wholesale</a>';
+
 function shellHeaderHTML() {
   return '' +
   '<a class="skip-link" href="#main">Skip to content</a>' +
@@ -147,13 +162,7 @@ function shellHeaderHTML() {
         '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
       '</button>' +
       '<a class="wordmark lockup" href="index.html">NEXUS <em>Research</em></a>' +
-      '<nav class="main-nav" aria-label="Main">' +
-        '<a href="shop.html">Catalog</a>' +
-        '<a href="shop.html?cat=peptides">Peptides</a>' +
-        '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
-        '<a href="shop.html?cat=supplies">Lab supplies</a>' +
-        '<a href="quality.html">Quality</a>' +
-      '</nav>' +
+      '<nav class="main-nav" aria-label="Main">' + NAV_LINKS + '</nav>' +
       '<div class="nav-right">' +
         '<a class="nav-about" href="about.html">About</a>' +
         '<button class="cart-btn" id="cartBtn" aria-label="Open cart">' +
@@ -162,15 +171,9 @@ function shellHeaderHTML() {
         '</button>' +
       '</div>' +
     '</div>' +
-    '<div class="mobile-menu" id="mobileMenu">' +
-      '<a href="shop.html">Catalog</a>' +
-      '<a href="shop.html?cat=peptides">Peptides</a>' +
-      '<a href="shop.html?cat=biochemicals">Biochemicals</a>' +
-      '<a href="shop.html?cat=supplies">Lab supplies</a>' +
-      '<a href="quality.html">Quality &amp; testing</a>' +
-      '<a href="certificates.html">Certificates</a>' +
-      '<a href="shipping.html">Shipping</a>' +
-      '<a href="wholesale.html">Wholesale</a>' +
+    /* Same NAV_LINKS as the desktop bar. The mobile menu also carries
+       About, which lives outside <nav> on desktop. */
+    '<div class="mobile-menu" id="mobileMenu">' + NAV_LINKS +
       '<a href="about.html">About</a>' +
     '</div>' +
   '</header>' +
