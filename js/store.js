@@ -404,6 +404,7 @@ function renderCartUI() {
     : "Free shipping applied";
 
   footEl.innerHTML =
+    cartUpsellHTML() +
     '<div class="ship-progress">' +
       '<span class="ship-msg' + (away <= 0 ? " unlocked" : "") + '">' + shipMsg + '</span>' +
       '<div class="progress-track"><div class="progress-bar" style="width:' + pct + '%"></div></div>' +
@@ -423,12 +424,63 @@ function renderCartUI() {
       removeItem(parseInt(btn.getAttribute("data-remove"), 10));
     });
   });
+  footEl.querySelectorAll("[data-upsell]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var items = getCart();
+      var id = btn.getAttribute("data-upsell");
+      var found = items.find(function (i) { return i.id === id && !i.sub; });
+      if (found) found.qty += 1;
+      else items.push({ id: id, qty: 1, sub: null });
+      saveCart(items);   // re-renders the drawer, which re-picks the suggestions
+    });
+  });
+
   itemsEl.querySelectorAll("[data-sub]").forEach(function (sel) {
     sel.addEventListener("change", function () {
       var v = sel.value;
       setLineSub(parseInt(sel.getAttribute("data-sub"), 10), v === "once" ? null : parseInt(v, 10));
     });
   });
+}
+
+
+/* Suggested add-ons in the cart.
+   A researcher buying a lyophilized compound needs a diluent, vials and
+   filters to work with it, so the supplies category is offered alongside
+   whatever is already in the basket. Nothing is added without a tap, and
+   an item already in the cart is never suggested again. */
+function cartUpsellHTML() {
+  var cart = getCart();
+  if (!cart.length) return "";
+
+  var have = cart.map(function (i) { return i.id; });
+  var wantsSupplies = cart.some(function (i) {
+    var p = getProductById(i.id);
+    return p && p.category !== "supplies";
+  });
+  if (!wantsSupplies) return "";
+
+  var picks = PRODUCTS.filter(function (p) {
+    return p.category === "supplies" && have.indexOf(p.id) === -1;
+  }).slice(0, 2);
+
+  if (!picks.length) return "";
+
+  return '<div class="drawer-upsell">' +
+    '<span class="drawer-upsell-head">Add to your order</span>' +
+    picks.map(function (p) {
+      return '<div class="upsell-row">' +
+        '<span class="upsell-thumb">' + productImg(p) + '</span>' +
+        '<span class="upsell-info">' +
+          '<b>' + esc(p.name) + '</b>' +
+          '<em>' + esc(p.size) + '</em>' +
+        '</span>' +
+        '<span class="upsell-price">' + money(p.price) + '</span>' +
+        '<button class="upsell-add" data-upsell="' + esc(p.id) + '" ' +
+          'aria-label="Add ' + esc(p.name) + ' to your order">Add</button>' +
+      '</div>';
+    }).join("") +
+  '</div>';
 }
 
 

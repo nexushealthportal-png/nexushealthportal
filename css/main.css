@@ -3188,3 +3188,50 @@ main > .container:last-child { padding-bottom: clamp(56px, 6vw, 88px); }
 }
 .footer-store-info strong { color: #fff; font-weight: 700; }
 .footer-store-info a { color: var(--mint); overflow-wrap: anywhere; }
+
+/* Suggested add-ons in the cart drawer. Sits above the totals so it is
+   seen before the eye lands on the checkout button. */
+.drawer-upsell {
+  border-top: 1px solid var(--line);
+  padding: 14px 0 4px;
+  margin-bottom: 12px;
+}
+.drawer-upsell-head {
+  display: block;
+  font-family: "Space Mono", monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+.upsell-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 8px 0;
+}
+.upsell-thumb {
+  flex: 0 0 auto; width: 40px; height: 40px;
+  overflow: hidden; background: #101010;
+}
+.upsell-thumb .tile-img { width: 100%; height: 100%; object-fit: cover; }
+.upsell-info { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.upsell-info b {
+  font-size: 12.5px; font-weight: 700; line-height: 1.25;
+  overflow-wrap: break-word;
+}
+.upsell-info em {
+  font-style: normal; font-size: 10.5px; color: var(--ink-soft);
+  font-family: "Space Mono", monospace; letter-spacing: .06em;
+}
+.upsell-price { flex: 0 0 auto; font-size: 12.5px; font-weight: 700; }
+.upsell-add {
+  flex: 0 0 auto;
+  background: transparent; color: var(--mint);
+  border: 1px solid var(--mint);
+  font-family: "Space Mono", monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 7px 11px; cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+}
+.upsell-add:hover { background: var(--mint); color: #04140F; }
+.sec-light .drawer-upsell-head,
+.sec-light .upsell-info em { color: var(--paper-soft); }
