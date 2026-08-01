@@ -3178,3 +3178,13 @@ main > .container:last-child { padding-bottom: clamp(56px, 6vw, 88px); }
 .pdp-bulk strong { color: #fff; font-weight: 700; }
 .pdp-bulk a { color: var(--mint); margin-left: 6px; }
 .sec-light .pdp-bulk strong { color: var(--paper-ink); }
+
+/* Store identity in the footer. Google Merchant Center requires a
+   contactable business on every page. */
+.footer-store-info {
+  display: flex; flex-wrap: wrap; gap: 8px 26px;
+  padding: 18px 0 4px;
+  font-size: 12.5px; color: var(--ink-soft);
+}
+.footer-store-info strong { color: #fff; font-weight: 700; }
+.footer-store-info a { color: var(--mint); overflow-wrap: anywhere; }

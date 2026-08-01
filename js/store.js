@@ -82,6 +82,13 @@ var SHIP_COST = 12.00;
 /* The compliance line, used verbatim and unchanged in the header, footer,
    product page, cart, and checkout. Do not reword it: the exact sentence
    is the point. */
+/* Google Merchant Center requires a contactable business in the footer:
+   a phone number and a physical address. Both are left empty until Wallace
+   supplies real ones. An invented address fails review harder than a
+   missing one, and the footer simply omits whatever is blank. */
+var NEXUS_PHONE = "";
+var NEXUS_ADDRESS = "";
+
 var RUO_VERBATIM = "For laboratory research use only. Not for human consumption.";
 
 /* Subscription terms, stated in full before the order is placed: what
@@ -297,10 +304,17 @@ function shellFooterHTML() {
           '<a href="mailto:support@nexushealthportal.com">support@<wbr>nexushealthportal.com</a>' +
           '<a href="wholesale.html">Wholesale</a>' +
           '<a href="index.html#faq">FAQ</a>' +
-          '<a href="shipping.html">Returns</a></div>' +
+          '<a href="refunds.html">Returns</a></div>' +
         '<div class="footer-col"><h4>Get in touch</h4>' +
           '<p class="footer-note">Lab chemicals and supplies, tested by an outside lab, with a test report on every batch.</p>' +
           '<p class="footer-badges"><span>HPLC + LC-MS</span><span>Tamper-sealed</span></p></div>' +
+      '</div>' +
+
+      '<div class="footer-store-info">' +
+        '<span><strong>Nexus Research</strong></span>' +
+        '<span><a href="mailto:support@nexushealthportal.com">support@<wbr>nexushealthportal.com</a></span>' +
+        (NEXUS_PHONE ? '<span>' + NEXUS_PHONE + '</span>' : '') +
+        (NEXUS_ADDRESS ? '<span>' + NEXUS_ADDRESS + '</span>' : '') +
       '</div>' +
 
       '<div class="footer-fine">' +
@@ -319,6 +333,7 @@ function shellFooterHTML() {
           '<a href="terms.html">Terms</a>' +
           '<a href="privacy.html">Privacy</a>' +
           '<a href="shipping.html">Shipping policy</a>' +
+        '<a href="refunds.html">Refunds &amp; returns</a>' +
           '<a href="ruo-agreement.html">RUO agreement</a>' +
         '</span>' +
       '</div>' +
